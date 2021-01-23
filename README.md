@@ -1,4 +1,4 @@
-# Wrangler.Dev
+# Regenerated.Dev
 
 ## Getting Started
 
