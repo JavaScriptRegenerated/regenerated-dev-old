@@ -1,4 +1,4 @@
-import { renderToString, attributes, html } from 'unyielding';
+import { renderToString, attributes, html } from 'yieldmarkup';
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
@@ -41,6 +41,7 @@ function* SharedStyle() {
 
   yield 'a { color: var(--link-color); }';
 
+  yield 'nav { margin: 1rem; }';
   yield 'article { margin: 1rem; }';
 
   yield 'h1 { font-size: 2rem; font-weight: bold; }';
@@ -69,6 +70,11 @@ async function HomePage() {
             <li><a href="/">Home</a></li>
           </ul>
         </nav>
+        <div role="img" style="position: relative; width: 100px; height: 100px;">
+          <span style="position: absolute; color: red">*</span>
+          <span style="position: absolute; color: red">*</span>
+          <span style="position: absolute; color: red">*</span>
+        </div>
         <main>
           <h1 class="measure">
             Regenerated.Dev
@@ -81,6 +87,12 @@ async function HomePage() {
           </article>
           <article class="measure">
             <h2>Parsing</h2>
+          </article>
+          <article class="measure">
+            <h2>Pattern Matching</h2>
+          </article>
+          <article class="measure">
+            <h2>State Machines</h2>
           </article>
           <article class="measure">
             <h2>Rendering HTML</h2>
