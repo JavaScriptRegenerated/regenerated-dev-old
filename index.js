@@ -275,7 +275,7 @@ function* SharedStyles() {
   yield fetchCSS('https://cdn.jsdelivr.net/gh/RoyalIcing/tela@3d61f6e92daaed960b19598c6c1d851420feae4e/tela.css');
   
   yield ':root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }';
-  yield ':root { background: #222; color: white }';
+  yield ':root { background: #1a1f30; color: white }';
   yield ':root { --measure: 44rem; --link-color: #00b4ff; }';
 
   yield '*, *:before, *:after { font: inherit; margin: 0; padding: 0; }';
