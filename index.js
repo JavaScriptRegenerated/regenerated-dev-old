@@ -24,11 +24,6 @@ function* CodeBlock(language, code) {
 }
 
 function* Articles() {
-yield html`<article class="measure">
-  <h2>Processing Collections</h2>
-  <p><em>Coming soon</em>
-</article>`;
-
 yield html`<article class="measure">`;
 yield html`<h2>Parsing</h2>`;
 yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/parcook">parcook</a>`;
@@ -212,11 +207,33 @@ function* Page() {
 
 // Resulting data waits for promises to resolve
 const html = await renderToString([Page()]);`.trim())
-yield html`</article>`
+yield html`</article>`;
+
+yield html`<article class="measure">
+<h2>Processing Collections</h2>
+<p><em>Coming soon</em>
+</article>`;
 
 yield html`<article class="measure">
   <h2>Animation</h2>
   <p><em>Coming soon</em>
+</article>`;
+}
+
+function CurrentYear() {
+  return (new Date).getFullYear();
+}
+
+function* ContentInfo() {
+  yield html`<footer role=contentinfo class="measure">
+  <p>
+    <small>
+    © ${CurrentYear()} Patrick Smith
+    · <a href="https://icing.space/">Blog</a>
+    · <a href="https://twitter.com/concreteniche/">Twitter</a>
+    · <a href="https://github.com/RoyalIcing/">GitHub</a>
+    · <a href="https://github.com/RoyalIcing/regenerated.dev">View source</a>
+    </small>
 </article>`;
 }
 
@@ -265,6 +282,7 @@ function* SharedStyles() {
   yield 'a { color: var(--link-color); }';
 
   yield 'nav { margin: 1rem; }';
+  yield 'header[role=banner] { margin: 2rem 1rem; }';
   yield 'article { margin: 4rem 1rem; }';
 
   yield 'h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }';
@@ -301,18 +319,19 @@ async function HomePage() {
       <link rel="dns-prefetch" href="https://unpkg.com">
       <script type=module src='/main.js'></script>
       <body>
-        <nav aria-label="Primary" class="measure">
+        <nav aria-label="Primary" class="measure" hidden>
           <ul class>
             <li><a href="/">Home</a></li>
           </ul>
         </nav>
+        <header role=banner class="measure -X-">
+          <h1>JavaScript Regenerated</h1>
+          <p><em>Rethinking JavaScript with Generator Functions.</em>
+        </header>
         <main>
-          <div class="measure -X-">
-            <h1>Regenerated.Dev</h1>
-            <p>Rethinking JavaScript with Generator Functions.
-          </div>
           ${Articles()}
         </main>
+        ${ContentInfo()}
         ${PrismScript()}
       </body>`,
   ]);
