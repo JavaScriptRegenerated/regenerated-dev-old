@@ -317,6 +317,7 @@ async function HomePage() {
     html`${Page.HtmlEn()} ${Meta.Title(`Regenerated.Dev`)} ${SharedStyleElement()}
       <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
       <link rel="dns-prefetch" href="https://unpkg.com">
+      <script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>
       <script type=module src='/main.js'></script>
       <body>
         <nav aria-label="Primary" class="measure" hidden>
