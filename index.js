@@ -26,11 +26,12 @@ function* CodeBlock(language, code) {
 function* Articles() {
 yield html`<article class="measure">
   <h2>Processing Collections</h2>
-  <p>Coming soon</p>
+  <p><em>Coming soon</em>
 </article>`;
 
 yield html`<article class="measure">`;
 yield html`<h2>Parsing</h2>`;
+yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/parcook">parcook</a>`;
 yield CodeBlock("javascript", `
 import { parse } from "parcook";
 
@@ -83,6 +84,7 @@ yield html`</article>
 `;
 yield html`<article class="measure">`;
 yield html`<h2>Pattern Matching</h2>`;
+yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldpattern">yieldpattern</a>`;
 yield CodeBlock("javascript", `
 import { match, _ } from "yieldpattern";
 
@@ -104,6 +106,7 @@ yield html`</article>`;
 
 yield html`<article class="measure">`;
 yield html`<h2>State Machines</h2>`;
+yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldmachine">yieldmachine</a>`;
 yield CodeBlock("javascript", `
 import { entry, on, start } from "yieldmachine";
 
@@ -155,11 +158,65 @@ yield html`</article>`;
 
 yield html`<article class="measure">
   <h2>Rendering HTML</h2>
-  <p><a href="https://github.com/RoyalIcing/yieldmarkup">yieldmarkup</a>
-</article>
-<article class="measure">
+  <p>GitHub: <a href="https://github.com/RoyalIcing/yieldmarkup">yieldmarkup</a>`;
+yield CodeBlock("javascript", `
+import { html, renderToString } from "yieldmarkup";
+import { fetchData } from "./yourAPI";
+
+function* NavLink(link) {
+  yield html\`<li>\`;
+  yield html\`<a href="\${link.url}">\`;
+  yield link.title;
+  yield html\`</a>\`;
+  yield html\`<li>\`;
+}
+
+function* Nav(links) {
+  yield html\`<nav aria-label="Primary">\`;
+  yield html\`<ul>\`;
+
+  for (const link of links) {
+    yield NavLink(link);
+  }
+
+  yield html\`</ul>\`;
+  yield html\`</nav>\`;
+}
+
+function* PrimaryNav() {
+  yield Nav([
+    { url: '/', title: 'Home' },
+    { url: '/pricing', title: 'Pricing' },
+    { url: '/features', title: 'Features' },
+    { url: '/terms', title: 'Terms & Conditions' },
+  ]);
+}
+
+function* Page() {
+  yield html\`<!doctype html>\`
+  yield html\`<html lang=en>\`
+  yield html\`<meta charset=utf-8>\`
+  yield html\`<meta name=viewport content="width=device-width">\`
+  yield html\`<body>\`;
+  yield PrimaryNav();
+  yield html\`<main>\`;
+  
+  // Can await any promise
+  const data = await fetchData();
+  yield html\`<pre>\`;
+  yield JSON.stringify(data);
+  yield html\`</pre>\`;
+  
+  yield html\`</main>\`;
+;}
+
+// Resulting data waits for promises to resolve
+const html = await renderToString([Page()]);`.trim())
+yield html`</article>`
+
+yield html`<article class="measure">
   <h2>Animation</h2>
-  <p>Coming soon
+  <p><em>Coming soon</em>
 </article>`;
 }
 
@@ -208,18 +265,21 @@ function* SharedStyles() {
   yield 'a { color: var(--link-color); }';
 
   yield 'nav { margin: 1rem; }';
-  yield 'article { margin: 1rem; }';
+  yield 'article { margin: 4rem 1rem; }';
 
-  yield 'h1 { font-size: 2rem; font-weight: bold; }';
-  yield 'h2 { font-size: 1.5rem; font-weight: bold; }';
-  yield 'h3 { font-size: 1.375rem; font-weight: bold; }';
+  yield 'h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }';
+  yield 'h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }';
+  yield 'h3 { font-size: 1.375rem; font-weight: bold; margin-bottom: 1rem; }';
   
+  yield 'p { margin: 1rem 0; }';
   yield 'pre { font-size: 0.8rem; }';
 
   yield 'dl { display: grid; grid-template-columns: minmax(min-content, auto) max-content; }';
   yield 'dt { font-weight: bold; }';
   yield 'dd { text-align: "." center; }';
   yield 'ul[class], ol[class] { list-style: none; }';
+  
+  yield 'em { font-style: italic; }';
 
   yield '.measure { max-width: var(--measure); }';
   yield '.measure:not(.measure *) { margin-left: auto; margin-right: auto; }';
