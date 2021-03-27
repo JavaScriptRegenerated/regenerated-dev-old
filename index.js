@@ -56,9 +56,9 @@ function* CodeBlock(language, code) {
 function* Articles() {
 yield html`<article class="measure">`;
 yield html`<h2>Parsing</h2>`;
-yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/parcook">parcook</a>`;
+yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldparser">yieldparser</a>`;
 yield CodeBlock("javascript", `
-import { parse } from "parcook";
+import { parse } from "yieldparser";
 
 function* Digit() {
   const [digit]: [string] = yield /^\d+/;
