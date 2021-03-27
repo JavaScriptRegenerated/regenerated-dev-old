@@ -1,6 +1,36 @@
+
 import { renderToString as renderHTML, attributes, html } from 'yieldmarkup';
 import { renderToString as renderCSS, prop, rule } from 'yieldcss';
+import { parse, mustEnd } from 'yieldparser';
+import { match, _ } from 'yieldpattern';
 import { toCode } from 'scalemodel';
+
+const contentTypes = {
+  html: 'text/html;charset=UTF-8',
+  javascript: 'text/javascript;charset=UTF-8',
+  json: 'application/json;charset=UTF-8',
+};
+
+function* PathParser() {
+  function* Home() {
+    yield '/';
+    yield mustEnd;
+    return { type: 'home' };
+  }
+  function* Article() {
+    yield '/article/';
+    const [slug] = yield /^([^\/]+)/;
+    yield mustEnd;
+    return { type: 'article', slug };
+  }
+  
+  return yield [Home, Article];
+}
+
+function parsePath(path) {
+  console.log("Parsing path", path);
+  return parse(path, PathParser());
+}
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
@@ -210,6 +240,11 @@ const html = await renderToString([Page()]);`.trim())
 yield html`</article>`;
 
 yield html`<article class="measure">
+  <h2>Generator Functions vs Classes</h2>
+  <p><em>Coming soon</em>
+</article>`;
+
+yield html`<article class="measure">
 <h2>Processing Collections</h2>
 <p><em>Coming soon</em>
 </article>`;
@@ -250,7 +285,6 @@ function *PrismScript() {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-ROhjG07IRaPZsryG77+MVyx3ZT5q3sGEGENoGItwc9xgvx+dl+s3D8Ob1zPdbl/iKklMKp7uFemLJFDRw0bvig==" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://unpkg.com/prism-theme-night-owl@1.4.0/build/style.css">
   <script>
-  //document.querySelectorAll('.post.category-javascript pre code').forEach(el => el.classList.add('language-jsx'));
   window.Prism.highlightAll();
   </script>`;
 }
@@ -372,7 +406,7 @@ function mainJS() {
   console.log(Array.from(${Example.name}()));
   `;
   
-  return new Response(source, { headers: { 'content-type': 'text/javascript' }});
+  return new Response(source, { headers: { 'content-type': contentTypes.javascript }});
 }
 
 /**
@@ -381,27 +415,19 @@ function mainJS() {
  */
 async function handleRequest(request) {
   try {
-    const { pathname, searchParams } = new URL(request.url);
-    
-    if (pathname === '/main.js') {
-      return mainJS();
+    const { pathname } = new URL(request.url);
+    const { success, result } = parsePath(pathname);
+  
+    if (!success) {
+      return new Response(`Page not found: ${pathname}`, { headers: { 'content-type': contentTypes.html } });
+    } else if (result.type === 'home') {
+      return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } });
+      /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
+    } else if (result.type === 'article') {
+      return new Response(result.slug, { headers: { 'content-type': contentTypes.html } });
     }
-    
-    const [, ...components] = pathname.split('/').filter(s => s.length > 0);
-    let contentType = 'text/html';
-
-    if (components.length === 0) {
-      var result = await HomePage();
-    } else {
-      var result = 'Not found ' + JSON.stringify(components);
-    }
-
-    return new Response(result, {
-      headers: {
-        'content-type': contentType,
-      },
-    });
   } catch (error) {
-    return new Response(error.message, { status: 500 });
+    console.error(error.message, error.stack);
+    return new Response(`Error: ${error.message} ${error.stack}`, { status: 500 });
   }
 }

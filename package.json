@@ -12,11 +12,15 @@
   "author": "Patrick Smith <pgwsmith@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@cloudflare/wrangler": "^1.15.0",
     "prettier": "^1.19.1"
   },
   "dependencies": {
+    "parcook": "^0.2.0",
     "scalemodel": "^0.1.0",
     "yieldcss": "^0.1.0",
-    "yieldmarkup": "^0.1.0"
+    "yieldmarkup": "^0.1.0",
+    "yieldparser": "^0.2.0",
+    "yieldpattern": "^0.1.1"
   }
 }
