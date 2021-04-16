@@ -13,6 +13,7 @@
   "license": "MIT",
   "devDependencies": {
     "@cloudflare/wrangler": "^1.15.0",
+    "@playwright/test": "^0.1101.0",
     "prettier": "^1.19.1"
   },
   "dependencies": {
