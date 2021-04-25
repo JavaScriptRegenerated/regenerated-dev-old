@@ -1,9 +1,9 @@
-
 import { renderToString as renderHTML, attributes, html } from 'yieldmarkup';
 import { renderToString as renderCSS, prop, rule } from 'yieldcss';
 import { parse, mustEnd } from 'yieldparser';
-import { match, _ } from 'yieldpattern';
 import { toCode } from 'scalemodel';
+import * as pages from './pages';
+import { CodeBlock } from './components';
 
 const contentTypes = {
   html: 'text/html;charset=UTF-8',
@@ -17,18 +17,21 @@ function* PathParser() {
     yield mustEnd;
     return { type: 'home' };
   }
-  function* Article() {
+  function* ArticleModule() {
     yield '/article/';
-    const [slug] = yield /^([^\/]+)/;
-    yield mustEnd;
+    const [, slug] = yield /^([^\/]+).js$/;
+    return { type: 'articleModule', slug };
+  }
+  function* ArticlePage() {
+    yield '/article/';
+    const [, slug] = yield /^([^\/]+)$/;
     return { type: 'article', slug };
   }
   
-  return yield [Home, Article];
+  return yield [Home, ArticleModule, ArticlePage];
 }
 
 function parsePath(path) {
-  console.log("Parsing path", path);
   return parse(path, PathParser());
 }
 
@@ -43,14 +46,6 @@ function* Term(term, definition) {
   yield html`<dd>`;
   yield definition;
   yield html`</dd>`;
-}
-
-function* CodeBlock(language, code) {
-  yield html`<pre ${attributes({ class: 'lang-' + language })}>`;
-  yield html`<code ${attributes({ class: 'lang-' + language })}>`;
-  yield code;
-  yield html`</code>`;
-  yield html`</pre>`;
 }
 
 function* Articles() {
@@ -105,8 +100,7 @@ parse('1.2.3.256', IPAddress());
 }
 */
 `.trim());
-yield html`</article>
-`;
+yield html`</article>`;
 yield html`<article class="measure">`;
 yield html`<h2>Pattern Matching</h2>`;
 yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldpattern">yieldpattern</a>`;
@@ -284,7 +278,7 @@ function *PrismScript() {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js" integrity="sha512-hqRrGU7ys5tkcqxx5FIZTBb7PkO2o3mU6U5+qB9b55kgMlBUT4J2wPwQfMCxeJW1fC8pBxuatxoH//z0FInhrA==" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-ROhjG07IRaPZsryG77+MVyx3ZT5q3sGEGENoGItwc9xgvx+dl+s3D8Ob1zPdbl/iKklMKp7uFemLJFDRw0bvig==" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://unpkg.com/prism-theme-night-owl@1.4.0/build/style.css">
-  <script>
+  <script type=module>
   window.Prism.highlightAll();
   </script>`;
 }
@@ -317,14 +311,19 @@ function* SharedStyles() {
   yield ':root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }';
   yield ':root { background: #1a1f30; color: white }';
   yield ':root { --measure: 44rem; --link-color: #00b4ff; }';
+  yield ':root { --highlight-code-bg: #011627; }';
 
   yield '*, *:before, *:after { font: inherit; margin: 0; padding: 0; }';
+  yield '* { --py: 0; --px: 0; padding-top: var(--py); padding-bottom: var(--py); padding-left: var(--px); padding-right: var(--px); }';
 
   yield 'a { color: var(--link-color); }';
 
   yield 'nav { margin: 1rem; }';
   yield 'header[role=banner] { margin: 2rem 1rem; }';
   yield 'article { margin: 4rem 1rem; }';
+
+  yield 'h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }';
+  yield 'input[type="text"] { --px: 0.25rem; }';
 
   yield 'h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }';
   yield 'h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }';
@@ -337,10 +336,12 @@ function* SharedStyles() {
   yield 'dt { font-weight: bold; }';
   yield 'dd { text-align: "." center; }';
   yield 'ul[class], ol[class] { list-style: none; }';
+
   
   yield 'em { font-style: italic; }';
 
   yield '.measure { max-width: var(--measure); }';
+  yield '.measure { --content-px: 1rem; }';
   yield '.measure:not(.measure *) { margin-left: auto; margin-right: auto; }';
 
   yield '.row { display: flex; flex-wrap: wrap; }';
@@ -357,11 +358,13 @@ function* SharedStyleElement() {
 
 async function HomePage() {
   return renderHTML([
-    html`${Page.HtmlEn()} ${Meta.Title(`Regenerated.Dev`)} ${SharedStyleElement()}
+    html`${Page.HtmlEn()} ${Meta.Title(`Regenerated.Dev`)}
       <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
       <link rel="dns-prefetch" href="https://unpkg.com">
+      <link rel="dns-prefetch" href="https://cdn.skypack.dev">
+      ${SharedStyleElement()}
+      ${PrismScript()}
       <script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>
-      <script type=module src='/main.js'></script>
       <body>
         <nav aria-label="Primary" class="measure" hidden>
           <ul class>
@@ -379,8 +382,41 @@ async function HomePage() {
         </div>
         </main>
         ${ContentInfo()}
-        ${PrismScript()}
-      </body>`,
+      `,
+  ]);
+}
+
+async function ArticlePage(url, { Primary, ClientModule }) {
+  const clientModuleURL = `${url.pathname}.js`;
+
+  return renderHTML([
+    html`${Page.HtmlEn()} ${Meta.Title(`Regenerated.Dev`)}
+      <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+      <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+      <link rel="dns-prefetch" href="https://unpkg.com">
+      <link rel="dns-prefetch" href="https://cdn.skypack.dev">
+      ${PrismScript()}
+      ${!!ClientModule && html`<script type=module src='${clientModuleURL}'></script>`}
+      <script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>
+      ${SharedStyleElement()}
+      <body>
+        <nav aria-label="Primary" class="measure" hidden>
+          <ul class>
+            <li><a href="/">Home</a></li>
+          </ul>
+        </nav>
+        <header role=banner class="measure -X-">
+          <h1>JavaScript Regenerated</h1>
+          <p><em>Rethinking JavaScript with Generator Functions.</em>
+        </header>
+        <main>
+        ${Primary()}
+        <div class="X -X-">
+          ${NewsletterForm()}
+        </div>
+        </main>
+        ${ContentInfo()}
+      `,
   ]);
 }
 
@@ -409,22 +445,40 @@ function mainJS() {
   return new Response(source, { headers: { 'content-type': contentTypes.javascript }});
 }
 
+function notFoundResponse(url) {
+  return new Response(`Page not found: ${url.pathname}`, { status: 404, headers: { 'content-type': contentTypes.html } });
+}
+
 /**
  * Respond with results
  * @param {Request} request
  */
 async function handleRequest(request) {
   try {
-    const { pathname } = new URL(request.url);
+    const url = new URL(request.url);
+    const { pathname } = url;
     const { success, result } = parsePath(pathname);
   
     if (!success) {
-      return new Response(`Page not found: ${pathname}`, { headers: { 'content-type': contentTypes.html } });
+      return notFoundResponse(url);
     } else if (result.type === 'home') {
       return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } });
       /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
     } else if (result.type === 'article') {
-      return new Response(result.slug, { headers: { 'content-type': contentTypes.html } });
+      if (result.slug in pages) {
+        return new Response(await ArticlePage(url, pages[result.slug]), { headers: { 'content-type': contentTypes.html } });
+      } else {
+        return notFoundResponse(url);
+      }
+      /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
+    } else if (result.type === 'articleModule') {
+      console.log('Route', JSON.stringify(result));
+      if (result.slug in pages && 'ClientModule' in pages[result.slug]) {
+        return new Response(pages[result.slug].ClientModule(), { headers: { 'content-type': contentTypes.javascript } });
+      } else {
+        return notFoundResponse(url);
+      }
+      /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
     }
   } catch (error) {
     console.error(error.message, error.stack);
