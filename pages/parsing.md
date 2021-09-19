@@ -11,7 +11,7 @@ function* Digit() {
   const [digit] = yield /^\d+/;
   const value = parseInt(digit, 10);
   if (value < 0 || value > 255) {
-    return new Error(\`Digit must be between 0 and 255, was \${value}\`);
+    return new Error(`Digit must be between 0 and 255, was ${value}`);
   }
   return value;
 }
