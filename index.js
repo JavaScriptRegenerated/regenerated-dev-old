@@ -6,7 +6,7 @@ import * as pages from './pages';
 import { CodeBlock } from './components';
 import { NewsletterForm } from './convertkit';
 
-const sha = '33a4008ff1ad5cc7a7c15f8f6ea6aea4c2068dcf'
+const sha = '922d9d9dab75751f4e539fac50535b18a6b4e951'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 
 const contentTypes = {
@@ -483,7 +483,12 @@ function notFoundResponse(url, html = '') {
 async function fetchPage(path) {
   const sourceURL = new URL(path, pressURL);
   console.log(sourceURL.toString())
-  const res = await fetch(sourceURL);
+  const res = await fetch(sourceURL, {
+    cf: {
+      cacheTtlByStatus: { "200-299": 86400, 404: 1, "500-599": 0 },
+      cacheEverything: true,
+    }
+  });
   if (res.status >= 400) {
     return notFoundResponse(sourceURL, `status: ${res.status} ${await res.text()}`);
   }
