@@ -6,7 +6,7 @@ import * as pages from './pages';
 import { CodeBlock } from './components';
 import { NewsletterForm } from './convertkit';
 
-const sha = 'd6e3d9de4d05a29ef1abad898ceee7c41379f776'
+const sha = '1c87cb21172670a9b61a91a26ba7c58f66a7e409'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 
 const contentTypes = {
