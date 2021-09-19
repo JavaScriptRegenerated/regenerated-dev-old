@@ -6,7 +6,7 @@ import * as pages from './pages';
 import { CodeBlock } from './components';
 import { NewsletterForm } from './convertkit';
 
-const sha = '922d9d9dab75751f4e539fac50535b18a6b4e951'
+const sha = 'd6e3d9de4d05a29ef1abad898ceee7c41379f776'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 
 const contentTypes = {
@@ -480,9 +480,8 @@ function notFoundResponse(url, html = '') {
   return new Response(`Page not found: ${url.pathname}` + html, { status: 404, headers: { 'content-type': contentTypes.html } });
 }
 
-async function fetchPage(path) {
+async function fetchContentHTML(path) {
   const sourceURL = new URL(path, pressURL);
-  console.log(sourceURL.toString())
   const res = await fetch(sourceURL, {
     cf: {
       cacheTtlByStatus: { "200-299": 86400, 404: 1, "500-599": 0 },
@@ -490,19 +489,21 @@ async function fetchPage(path) {
     }
   });
   if (res.status >= 400) {
-    return notFoundResponse(sourceURL, `status: ${res.status} ${await res.text()}`);
+    return null
   }
+  return res.text()
+}
 
-  const values = await Promise.all(SharedStyles());
-  console.log(values[0])
-
-  const html = await res.text();
+async function fetchPage(path) {
   return new Response(
     renderStyledHTML(
       `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
       await renderHTML(SharedStyleElement()),
       `<body>`,
-      html
+      `<main>`,
+      await fetchContentHTML(path),
+      `</main>`,
+      await fetchContentHTML("pages/_footer.md"),
     ),
     { headers: { 'content-type': contentTypes.html } }
   );
