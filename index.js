@@ -498,7 +498,12 @@ async function fetchPage(path) {
 
   const html = await res.text();
   return new Response(
-    renderStyledHTML(await renderHTML(SharedStyleElement()), html),
+    renderStyledHTML(
+      `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
+      await renderHTML(SharedStyleElement()),
+      `<body>`,
+      html
+    ),
     { headers: { 'content-type': contentTypes.html } }
   );
 }
@@ -516,7 +521,8 @@ async function handleRequest(request) {
     if (!success) {
       return notFoundResponse(url);
     } else if (result.type === 'home') {
-      return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } });
+      return fetchPage("pages/home.md")
+      /* return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } }); */
       /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
     } else if (result.type === 'article') {
       if (result.slug === 'parsing') {

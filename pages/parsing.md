@@ -52,3 +52,9 @@ parse('1.2.3.256', IPAddress());
 }
 */
 ```
+
+## Router
+
+```js
+// Coming soon
+```
