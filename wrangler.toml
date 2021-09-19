@@ -1,6 +1,9 @@
 name = "regenerated-dev"
 type = "webpack"
-workers_dev = true
-route = "*.regenerated.dev/*"
+routes = ["regenerated.dev/*", "www.regenerated.dev/*"]
 zone_id = ""
 kv_namespaces = []
+
+[env.staging]
+name = "regenerated-dev-staging"
+route = "staging.regenerated.dev/*"
