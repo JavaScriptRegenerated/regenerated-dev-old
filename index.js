@@ -1,4 +1,4 @@
-import { renderToString as renderHTML, attributes, html } from 'yieldmarkup';
+import { renderToString as renderHTML, attributes, html, safe } from 'yieldmarkup';
 import { renderToString as renderCSS, prop, rule } from 'yieldcss';
 import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
@@ -301,12 +301,13 @@ const Meta = {
 };
 
 function fetchCSS(url) {
-  return fetch(url).then(res => res.text());
+  return fetch(url).then(res => res.text()).then(s => safe(s));
+  //return fetch(url).then(res => res.text());
 }
 
 function* SharedStyles() {
   yield fetchCSS('https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css');
-  yield fetchCSS('https://cdn.jsdelivr.net/gh/RoyalIcing/tela@3d61f6e92daaed960b19598c6c1d851420feae4e/tela.css');
+  yield fetchCSS('https://cdn.jsdelivr.net/gh/RoyalIcing/tela@80ad30c8fa56fc6e1b7d3178d11c027a24bee5a2/tela.css');
   
   yield ':root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }';
   yield ':root { background: #1a1f30; color: white }';
@@ -323,7 +324,7 @@ function* SharedStyles() {
   yield 'article { margin: 4rem 1rem; }';
 
   yield 'h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }';
-  yield 'input[type="text"] { --px: 0.25rem; }';
+  yield String(' input[type="text"] { padding-left: 0.25rem; }');
 
   yield 'h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }';
   yield 'h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }';
@@ -336,7 +337,6 @@ function* SharedStyles() {
   yield 'dt { font-weight: bold; }';
   yield 'dd { text-align: "." center; }';
   yield 'ul[class], ol[class] { list-style: none; }';
-
   
   yield 'em { font-style: italic; }';
 
@@ -405,8 +405,8 @@ async function ArticlePage(url, { Primary, ClientModule }) {
             <li><a href="/">Home</a></li>
           </ul>
         </nav>
-        <header role=banner class="measure -X-">
-          <h1>JavaScript Regenerated</h1>
+        <header role=banner class="measure X |X-X|" data-links="current-color underline-on-hover">
+          <div><a href="/">JavaScript Regenerated</a></div>
           <p><em>Rethinking JavaScript with Generator Functions.</em>
         </header>
         <main>

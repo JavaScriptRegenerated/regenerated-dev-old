@@ -1,7 +1,9 @@
 include .envrc
 
-dev:
+install: package-lock.json
 	npm ci
+
+dev: install
 	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) npm start
 	
 production:
