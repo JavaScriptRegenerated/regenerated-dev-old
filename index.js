@@ -48,8 +48,8 @@ function *PrismScript() {
   </script>`;
 }
 
-async function renderStyledHTML(...contentHTML) {
-  return [
+async function* chunkStyledHTML(makeContentHTML) {
+  yield * [
     `<!doctype html>`,
     `<html lang=en>`,
     `<meta charset=utf-8>`,
@@ -64,8 +64,7 @@ async function renderStyledHTML(...contentHTML) {
     `<script defer src="${ExternalScripts.highlightJS.src}"></script>`,
     `<script defer src="${ExternalScripts.highlightJSLanguageJSON.src}"></script>`,
     `<style>
-    body { max-width: 50rem; margin: auto; padding: 3rem 1rem; }
-    a { color: #0060F2; }
+    body { max-width: 50rem; margin: auto; padding: calc(1rem + 1vh + 1vw) 1rem; }
     a:hover { text-decoration: underline; }
     p, ul, ol, pre, hr, blockquote, h1, h2, h3, h4, h5, h6 { margin-bottom: 1rem; }
     h1 { font-size: 2em; font-weight: 600; }
@@ -82,10 +81,34 @@ async function renderStyledHTML(...contentHTML) {
     nav li:not(:first-child) a { border-left: none; }
     nav a:hover { background: #e9e9e9; border-color: #ddd; }
     </style>`,
-    await renderHTML(SharedStyleElement()),
-    await renderHTML(PrismScript()),
-    ...contentHTML,
-  ].join('\n')
+  ]
+  
+  yield renderHTML(SharedStyleElement())
+
+  yield *makeContentHTML()
+}
+
+function streamStyledHTML(makeContentHTML) {
+  console.log("streamStyledHTML")
+  const encoder = new TextEncoder()
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+
+  async function performWrite() {
+    for await (const chunk of chunkStyledHTML(makeContentHTML)) {
+      await writer.write(encoder.encode(chunk));
+    }
+  }
+
+  return [readable, performWrite()];
+}
+
+async function renderStyledHTML(makeContentHTML) {
+  let chunks = [];
+  for await (const chunk of chunkStyledHTML(makeContentHTML)) {
+    chunks.push(chunk);
+  }
+  return chunks.join('\n')
 }
 
 function* PathParser() {
@@ -113,7 +136,7 @@ function parsePath(path) {
 }
 
 addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
+  event.respondWith(handleRequest(event.request, event));
 });
 
 // function CurrentYear() {
@@ -160,7 +183,7 @@ function* SharedStyles() {
   yield 'h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }';
   yield 'input[type="text"] { padding-left: 0.25rem; }';
 
-  yield 'h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }';
+  yield 'h1 { font-size: 2rem; line-height: 1.2; font-weight: bold; margin-bottom: 1rem; }';
   yield 'h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }';
   yield 'h3 { font-size: 1.375rem; font-weight: bold; margin-bottom: 1rem; }';
   
@@ -215,17 +238,34 @@ function renderModuleScript(path) {
   return `<script type=module src="${sourceURL}"></script>`
 }
 
-async function renderPage(path, clientPath, title) {
+async function renderPage(event, url, path, clientPath, title) {
+  if (url.searchParams.has('stream')) {
+    console.log("will stream")
+    const [stream, promise] = streamStyledHTML(() => [
+      renderHTML([html`<title>`, title, html`</title>`]),
+      clientPath ? renderModuleScript(clientPath) : '',
+      `<body>`,
+      `<p>Streaming!`,
+      `<main>`,
+      fetchContentHTML(path),
+      `</main>`,
+      fetchContentHTML("pages/_footer.md"),
+    ]);
+
+    event.waitUntil(promise);
+    return new Response(stream, { headers: { 'content-type': contentTypes.html } });
+  }
+
   return new Response(
-    await renderStyledHTML(
-      await renderHTML([html`<title>`, title, html`</title>`]),
+    await renderStyledHTML(() => [
+      renderHTML([html`<title>`, title, html`</title>`]),
       clientPath ? renderModuleScript(clientPath) : '',
       `<body>`,
       `<main>`,
-      await fetchContentHTML(path),
+      fetchContentHTML(path),
       `</main>`,
-      await fetchContentHTML("pages/_footer.md"),
-    ),
+      fetchContentHTML("pages/_footer.md"),
+    ]),
     { headers: { 'content-type': contentTypes.html } }
   );
 }
@@ -233,23 +273,28 @@ async function renderPage(path, clientPath, title) {
 /**
  * Respond with results
  * @param {Request} request
+ * @param {Event} event
  */
-async function handleRequest(request) {
+async function handleRequest(request, event) {
   const url = new URL(request.url);
   const { pathname } = url;
   const { success, result } = parsePath(pathname);
 
+  console.log('Go!')
+  const render = renderPage.bind(null, event, url)
+  console.log('Go 2!')
+
   if (!success) {
     return notFoundResponse(url);
   } else if (result.type === 'home') {
-    return renderPage("pages/home.md", undefined, 'JavaScript Regenerated')
+    return render("pages/home.md", undefined, 'JavaScript Regenerated')
     /* return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } }); */
     /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
   } else if (result.type === 'article') {
     if (result.slug === 'parsing') {
-      return renderPage("pages/parsing.md", "pages/parsing.client.js", 'JavaScript Regenerated: Parsing')
+      return render("pages/parsing.md", "pages/parsing.client.js", 'JavaScript Regenerated: Parsing')
     } else if (result.slug === 'pattern-matching') {
-      return renderPage("pages/pattern-matching.md", undefined, 'JavaScript Regenerated: Pattern Matching')
+      return render("pages/pattern-matching.md", undefined, 'JavaScript Regenerated: Pattern Matching')
     } else {
       return notFoundResponse(url);
     }

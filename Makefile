@@ -13,13 +13,13 @@ staging: clean shaState.js
 	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish --env staging
 
 preview: clean shaState.js
-	wrangler preview --watch
+	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler preview --watch
 
 logs_production:
-	wrangler tail
+	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail
 
 logs_staging:
-	wrangler tail --env staging
+	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail --env staging
 
 clean:
 	rm -rf dist/ worker/
