@@ -36,6 +36,8 @@ function apply() {
   outputEl.textContent = JSON.stringify(output, null, 2);
   if (window.Prism) {
     window.Prism.highlightElement(outputEl);
+  } else if (window.hljs) {
+    window.hljs.highlightElement(outputEl)
   }
 }
 inputEl.addEventListener('input', {

@@ -12,17 +12,57 @@ const contentTypes = {
   json: 'application/json;charset=UTF-8',
 };
 
+const Stylesheets = {
+  highlightNightOwl: "https://cdn.jsdelivr.net/npm/highlight.js@11.2.0/styles/night-owl.css",
+  highlightNightOwl: "https://unpkg.com/highlight.js@11.2.0/styles/night-owl.css",
+  tailwindBase: "https://cdn.jsdelivr.net/npm/tailwindcss@^2/dist/base.min.css",
+  tela: "https://cdn.jsdelivr.net/gh/RoyalIcing/tela@80ad30c8fa56fc6e1b7d3178d11c027a24bee5a2/tela.css",
+  // "https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css"
+}
+
+const ExternalScripts = {
+  prismCore: {
+    src: "https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js",
+    integrity: "sha512-hqRrGU7ys5tkcqxx5FIZTBb7PkO2o3mU6U5+qB9b55kgMlBUT4J2wPwQfMCxeJW1fC8pBxuatxoH//z0FInhrA=="
+  },
+  prismAutoloader: {
+    src: "https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js",
+    integrity: "sha512-ROhjG07IRaPZsryG77+MVyx3ZT5q3sGEGENoGItwc9xgvx+dl+s3D8Ob1zPdbl/iKklMKp7uFemLJFDRw0bvig=="
+  },
+  highlightJS: {
+    src: "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.2.0/highlight.min.js",
+  },
+  highlightJSLanguageJSON: {
+    src: "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.2.0/languages/json.min.js",
+  },
+}
+
+function *PrismScript() {
+  return;
+  yield html`<!-- Prism syntax highlighting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js" integrity="sha512-hqRrGU7ys5tkcqxx5FIZTBb7PkO2o3mU6U5+qB9b55kgMlBUT4J2wPwQfMCxeJW1fC8pBxuatxoH//z0FInhrA==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-ROhjG07IRaPZsryG77+MVyx3ZT5q3sGEGENoGItwc9xgvx+dl+s3D8Ob1zPdbl/iKklMKp7uFemLJFDRw0bvig==" crossorigin="anonymous"></script>
+  <!--<link rel="stylesheet" href="https://unpkg.com/prism-theme-night-owl@1.4.0/build/style.css">-->
+  <script type=module>
+  //window.Prism.highlightAll();
+  </script>`;
+}
+
 async function renderStyledHTML(...contentHTML) {
   return [
     `<!doctype html>`,
     `<html lang=en>`,
     `<meta charset=utf-8>`,
     `<meta name=viewport content="width=device-width, initial-scale=1.0">`,
-    // '<link href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css" rel="stylesheet">',
-    '<link href="https://unpkg.com/tailwindcss@^2/dist/base.min.css" rel="stylesheet">',
-    '<link href="https://unpkg.com/highlight.js@11.2.0/styles/night-owl.css" rel="stylesheet">',
-    '<link href="https://cdn.jsdelivr.net/gh/RoyalIcing/tela@80ad30c8fa56fc6e1b7d3178d11c027a24bee5a2/tela.css" rel="stylesheet">',
-    `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
+    `<link rel=preload href="${Stylesheets.tailwindBase}" as=style>`,
+    `<link rel=preload href="${Stylesheets.highlightNightOwl}" as=style>`,
+    `<link rel=preload href="${Stylesheets.tela}" as=style>`,
+    `<script defer src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI"></script>`,
+    `<link href="${Stylesheets.tailwindBase}" rel="stylesheet">`,
+    `<link href="${Stylesheets.highlightNightOwl}" rel="stylesheet">`,
+    `<link href="${Stylesheets.tela}" rel="stylesheet">`,
+    `<script src="${ExternalScripts.highlightJS.src}"></script>`,
+    `<script src="${ExternalScripts.highlightJSLanguageJSON.src}"></script>`,
     `<style>
     body { max-width: 50rem; margin: auto; padding: 3rem 1rem; }
     a { color: #0060F2; }
@@ -79,16 +119,6 @@ addEventListener('fetch', event => {
 // function CurrentYear() {
 //   return (new Date).getFullYear();
 // }
-
-function *PrismScript() {
-  yield html`<!-- Prism syntax highlighting -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js" integrity="sha512-hqRrGU7ys5tkcqxx5FIZTBb7PkO2o3mU6U5+qB9b55kgMlBUT4J2wPwQfMCxeJW1fC8pBxuatxoH//z0FInhrA==" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-ROhjG07IRaPZsryG77+MVyx3ZT5q3sGEGENoGItwc9xgvx+dl+s3D8Ob1zPdbl/iKklMKp7uFemLJFDRw0bvig==" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://unpkg.com/prism-theme-night-owl@1.4.0/build/style.css">
-  <script type=module>
-  window.Prism.highlightAll();
-  </script>`;
-}
 
 const Page = {
   *HtmlEn() {
