@@ -6,7 +6,7 @@ Library used: [yieldparser](https://github.com/RoyalIcing/yieldparser)
 
 <form class="Y">
 <label for=parsing-ip-address-input>Enter text to parse:</label> <input id=parsing-ip-address-input type=text value="1.2.3.4">
-<output id=parsing-ip-address-output class="X" style="background: var(--highlight-code-bg)"><pre><code class="target language-json"></code></pre></output>
+<output id=parsing-ip-address-output><pre><code class="target language-json"></code></pre></output>
 </form>
 
 ```js
