@@ -1,11 +1,8 @@
-import { renderToString as renderHTML, attributes, html, safe } from 'yieldmarkup';
-import { renderToString as renderCSS, prop, rule } from 'yieldcss';
+import { renderToString as renderHTML, html, safe } from 'yieldmarkup';
 import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
-import * as pages from './pages';
-import { NewsletterForm } from './convertkit';
 
-const sha = '6712159c848f02bcbe26d521057e7232451f1bfd'
+const sha = 'a710086c8ff6550b75327a6586b7f32d53449602'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 const jsdelivrURL = new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`)
 
@@ -15,7 +12,7 @@ const contentTypes = {
   json: 'application/json;charset=UTF-8',
 };
 
-function renderStyledHTML(...contentHTML) {
+async function renderStyledHTML(...contentHTML) {
   return [
     `<!doctype html>`,
     `<html lang=en>`,
@@ -24,6 +21,8 @@ function renderStyledHTML(...contentHTML) {
     // '<link href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css" rel="stylesheet">',
     '<link href="https://unpkg.com/tailwindcss@^2/dist/base.min.css" rel="stylesheet">',
     '<link href="https://unpkg.com/highlight.js@11.2.0/styles/night-owl.css" rel="stylesheet">',
+    '<link href="https://cdn.jsdelivr.net/gh/RoyalIcing/tela@80ad30c8fa56fc6e1b7d3178d11c027a24bee5a2/tela.css" rel="stylesheet">',
+    `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
     `<style>
     body { max-width: 50rem; margin: auto; padding: 3rem 1rem; }
     a { color: #0060F2; }
@@ -43,6 +42,8 @@ function renderStyledHTML(...contentHTML) {
     nav li:not(:first-child) a { border-left: none; }
     nav a:hover { background: #e9e9e9; border-color: #ddd; }
     </style>`,
+    await renderHTML(SharedStyleElement()),
+    await renderHTML(PrismScript()),
     ...contentHTML,
   ].join('\n')
 }
@@ -112,9 +113,6 @@ function fetchCSS(url) {
 }
 
 function* SharedStyles() {
-  yield fetchCSS('https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css');
-  yield fetchCSS('https://cdn.jsdelivr.net/gh/RoyalIcing/tela@80ad30c8fa56fc6e1b7d3178d11c027a24bee5a2/tela.css');
-  
   yield ':root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }';
   yield ':root { background: #1a1f30; color: white }';
   yield ':root { --measure: 44rem; --link-color: #00b4ff; }';
@@ -130,7 +128,7 @@ function* SharedStyles() {
   yield 'article { margin: 4rem 1rem; }';
 
   yield 'h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }';
-  yield String(' input[type="text"] { padding-left: 0.25rem; }');
+  yield 'input[type="text"] { padding-left: 0.25rem; }';
 
   yield 'h1 { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; }';
   yield 'h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }';
@@ -160,7 +158,7 @@ function* SharedStyles() {
 
 function* SharedStyleElement() {
   yield html`<style>`;
-  yield renderCSS(SharedStyles());
+  yield safe(Array.from(SharedStyles()).join('\n'));
   yield html`</style>`;
 }
 
@@ -187,13 +185,11 @@ function renderModuleScript(path) {
   return `<script type=module src="${sourceURL}"></script>`
 }
 
-async function renderPage(path, clientPath) {
+async function renderPage(path, clientPath, title) {
   return new Response(
-    renderStyledHTML(
-      `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
+    await renderStyledHTML(
+      await renderHTML([html`<title>`, title, html`</title>`]),
       clientPath ? renderModuleScript(clientPath) : '',
-      await renderHTML(SharedStyleElement()),
-      await renderHTML(PrismScript()),
       `<body>`,
       `<main>`,
       await fetchContentHTML(path),
@@ -209,83 +205,24 @@ async function renderPage(path, clientPath) {
  * @param {Request} request
  */
 async function handleRequest(request) {
-  try {
-    const url = new URL(request.url);
-    const { pathname } = url;
-    const { success, result } = parsePath(pathname);
-  
-    if (!success) {
-      return notFoundResponse(url);
-    } else if (result.type === 'home') {
-      return renderPage("pages/home.md")
-      /* return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } }); */
-      /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
-    } else if (result.type === 'article') {
-      if (result.slug === 'parsing') {
-        return renderPage("pages/parsing.md", "pages/parsing.client.js")
-      } else if (result.slug === 'pattern-matching') {
-        return renderPage("pages/pattern-matching.md")
-      } else {
-        return notFoundResponse(url);
-      }
-      /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
-    } else if (result.type === 'articleModule') {
-      if (result.slug === 'parsing') {
-        const js = `
-  //import { parse, mustEnd } from "https://unpkg.com/yieldparser@0.2.0/dist/yieldparser.umd.js?module";
-  //import { parse, mustEnd } from "https://cdn.skypack.dev/yieldparser";
-  //import { parse, mustEnd } from "https://unpkg.com/yieldparser@0.2.0/dist/yieldparser.modern.js";
-  import { parse, mustEnd } from "https://cdn.jsdelivr.net/npm/yieldparser@0.2.0/dist/yieldparser.modern.js";
-  
-  function* Digit() {
-    const [digit] = yield /^[0-9]+/;
-    const value = parseInt(digit, 10);
-    if (value < 0 || value > 255) {
-      return new Error(\`Digit must be between 0 and 255, was \${value}\`);
-    }
-    return value;
-  }
-  
-  function* IPAddress() {
-    const first = yield Digit;
-    yield '.';
-    const second = yield Digit;
-    yield '.';
-    const third = yield Digit;
-    yield '.';
-    const fourth = yield Digit;
-    yield mustEnd;
-    return [first, second, third, fourth];
-  }
-  
-  const inputEl = document.querySelector("#parsing-ip-address-input");
-  const outputEl = document.querySelector("#parsing-ip-address-output .target");
-  function apply() {
-    const input = inputEl.value;
-    console.log({ input });
-    const output = parse(input, IPAddress());
-    outputEl.textContent = JSON.stringify(output, null, 2);
-    window.Prism.highlightElement(outputEl);
-  }
-  inputEl.addEventListener('input', {
-    handleEvent(event) {
-      apply();
-    }
-  });
-  apply();
-  `;
-  return new Response(js, { headers: { 'content-type': contentTypes.javascript } });
-      }
+  const url = new URL(request.url);
+  const { pathname } = url;
+  const { success, result } = parsePath(pathname);
 
-      if (result.slug in pages && 'ClientModule' in pages[result.slug]) {
-        return new Response(pages[result.slug].ClientModule(), { headers: { 'content-type': contentTypes.javascript } });
-      } else {
-        return notFoundResponse(url);
-      }
-      /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
+  if (!success) {
+    return notFoundResponse(url);
+  } else if (result.type === 'home') {
+    return renderPage("pages/home.md", undefined, 'JavaScript Regenerated')
+    /* return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } }); */
+    /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
+  } else if (result.type === 'article') {
+    if (result.slug === 'parsing') {
+      return renderPage("pages/parsing.md", "pages/parsing.client.js", 'JavaScript Regenerated: Parsing')
+    } else if (result.slug === 'pattern-matching') {
+      return renderPage("pages/pattern-matching.md", undefined, 'JavaScript Regenerated: Pattern Matching')
+    } else {
+      return notFoundResponse(url);
     }
-  } catch (error) {
-    console.error(error.message, error.stack);
-    return new Response(`Error: ${error.message} ${error.stack}`, { status: 500 });
+    /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
   }
 }
