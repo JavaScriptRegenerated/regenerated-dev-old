@@ -1,8 +1,8 @@
 import { renderToString as renderHTML, html, safe } from 'yieldmarkup';
 import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
+import { sha } from './shaState';
 
-const sha = 'a710086c8ff6550b75327a6586b7f32d53449602'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 const jsdelivrURL = new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`)
 
@@ -61,8 +61,8 @@ async function renderStyledHTML(...contentHTML) {
     `<link href="${Stylesheets.tailwindBase}" rel="stylesheet">`,
     `<link href="${Stylesheets.highlightNightOwl}" rel="stylesheet">`,
     `<link href="${Stylesheets.tela}" rel="stylesheet">`,
-    `<script src="${ExternalScripts.highlightJS.src}"></script>`,
-    `<script src="${ExternalScripts.highlightJSLanguageJSON.src}"></script>`,
+    `<script defer src="${ExternalScripts.highlightJS.src}"></script>`,
+    `<script defer src="${ExternalScripts.highlightJSLanguageJSON.src}"></script>`,
     `<style>
     body { max-width: 50rem; margin: auto; padding: 3rem 1rem; }
     a { color: #0060F2; }
