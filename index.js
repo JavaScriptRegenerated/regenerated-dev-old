@@ -3,10 +3,9 @@ import { renderToString as renderCSS, prop, rule } from 'yieldcss';
 import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
 import * as pages from './pages';
-import { CodeBlock } from './components';
 import { NewsletterForm } from './convertkit';
 
-const sha = 'bd6b0278a74a4c323777d7e3390d3be2866b6b73'
+const sha = 'b611d7c362cc5de419c1cd2e5678bc06fb705d38'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 const jsdelivrURL = new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`)
 
@@ -76,234 +75,9 @@ addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
 
-function* Term(term, definition) {
-  yield html`<dt>`;
-  yield term;
-  yield html`</dt>`;
-  yield html`<dd>`;
-  yield definition;
-  yield html`</dd>`;
-}
-
-function* Articles() {
-yield html`<article class="measure">`;
-yield html`<h2>Parsing</h2>`;
-yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldparser">yieldparser</a>`;
-yield CodeBlock("javascript", `
-import { parse } from "yieldparser";
-
-function* Digit() {
-  const [digit]: [string] = yield /^\d+/;
-  const value = parseInt(digit, 10);
-  if (value < 0 || value > 255) {
-    return new Error(\`Digit must be between 0 and 255, was \${value}\`);
-  }
-  return value;
-}
-
-function* IPAddress() {
-  const first = yield Digit;
-  yield '.';
-  const second = yield Digit;
-  yield '.';
-  const third = yield Digit;
-  yield '.';
-  const fourth = yield Digit;
-  yield mustEnd;
-  return [first, second, third, fourth];
-}
-
-parse('1.2.3.4', IPAddress());
-/*
-{
-  success: true,
-  result: [1, 2, 3, 4],
-  remaining: '',
-}
-*/
-
-parse('1.2.3.256', IPAddress());
-/*
-{
-  success: false,
-  failedOn: {
-    nested: [
-      expect.objectContaining({
-        yielded: new Error('Digit must be between 0 and 255, was 256'),
-      }),
-    ],
-  },
-  remaining: '256',
-}
-*/
-`.trim());
-yield html`</article>`;
-yield html`<article class="measure">`;
-yield html`<h2>Pattern Matching</h2>`;
-yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldpattern">yieldpattern</a>`;
-yield CodeBlock("javascript", `
-import { match, _ } from "yieldpattern";
-
-function* FormatPoint(point) {
-  switch (yield point) {
-    case yield [0, 0]: return "origin";
-    case yield [0, _]: return \`y = \${point[1]}\`;
-    case yield [_, 0]: return \`x = \${point[0]}\`;
-    default: return \`x = \${point[0]}, y = \${point[1]}\`;
-  }
-}
-
-match(FormatPoint([0, 0])); // 'origin'
-match(FormatPoint([0, 7])); // 'y = 7'
-match(FormatPoint([12, 0])); // 'x = 12'
-match(FormatPoint([5, 9])); // 'x = 5, y = 9'
-`.trim());
-yield html`</article>`;
-
-yield html`<article class="measure">`;
-yield html`<h2>State Machines</h2>`;
-yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldmachine">yieldmachine</a>`;
-yield CodeBlock("javascript", `
-import { entry, on, start } from "yieldmachine";
-
-const exampleURL = new URL("https://example.org/");
-function fetchData() {
-  return fetch(exampleURL);
-}
-
-// Define a machine just using functions
-function Loader() {
-  // Each state is a generator function
-  function* idle() {
-    yield on("FETCH", loading);
-  }
-  // This is the ‘loading’ state
-  function* loading() {
-    // This function will be called when this state is entered.
-    // Its return value is available at \`loader.results.fetchData\`
-    yield entry(fetchData);
-    // If the promise succeeds, we will transition to the \`success\` state
-    // If the promise fails, we will transition to the \`failure\` state
-    yield on("SUCCESS", success);
-    yield on("FAILURE", failure);
-  }
-  // States that don’t yield anything are final
-  function* success() {}
-  // Or they can define transitions to other states
-  function* failure() {
-    // When the RETRY event happens, we transition from ‘failure’ to ‘loading’
-    yield on("RETRY", loading);
-  }
-
-  // Return the initial state from your machine definition
-  return idle;
-}
-
-const loader = start(Loader);
-loader.current; // "idle"
-
-loader.next("FETCH");
-loader.current; // "loading"
-
-loader.results.then((results) => {
-  console.log("Fetched", results.fetchData); // Use response of fetch()
-  loader.current; // "success"
-});
-`.trim());
-yield html`</article>`;
-
-yield html`<article class="measure">
-  <h2>Rendering HTML</h2>
-  <p>GitHub: <a href="https://github.com/RoyalIcing/yieldmarkup">yieldmarkup</a>`;
-yield CodeBlock("javascript", `
-import { html, renderToString } from "yieldmarkup";
-import { fetchData } from "./yourAPI";
-
-function* NavLink(link) {
-  yield html\`<li>\`;
-  yield html\`<a href="\${link.url}">\`;
-  yield link.title;
-  yield html\`</a>\`;
-  yield html\`<li>\`;
-}
-
-function* Nav(links) {
-  yield html\`<nav aria-label="Primary">\`;
-  yield html\`<ul>\`;
-
-  for (const link of links) {
-    yield NavLink(link);
-  }
-
-  yield html\`</ul>\`;
-  yield html\`</nav>\`;
-}
-
-function* PrimaryNav() {
-  yield Nav([
-    { url: '/', title: 'Home' },
-    { url: '/pricing', title: 'Pricing' },
-    { url: '/features', title: 'Features' },
-    { url: '/terms', title: 'Terms & Conditions' },
-  ]);
-}
-
-function* Page() {
-  yield html\`<!doctype html>\`
-  yield html\`<html lang=en>\`
-  yield html\`<meta charset=utf-8>\`
-  yield html\`<meta name=viewport content="width=device-width">\`
-  yield html\`<body>\`;
-  yield PrimaryNav();
-  yield html\`<main>\`;
-  
-  // Can await any promise
-  const data = await fetchData();
-  yield html\`<pre>\`;
-  yield JSON.stringify(data);
-  yield html\`</pre>\`;
-  
-  yield html\`</main>\`;
-;}
-
-// Resulting data waits for promises to resolve
-const html = await renderToString([Page()]);`.trim())
-yield html`</article>`;
-
-yield html`<article class="measure">
-  <h2>Generator Functions vs Classes</h2>
-  <p><em>Coming soon</em>
-</article>`;
-
-yield html`<article class="measure">
-<h2>Processing Collections</h2>
-<p><em>Coming soon</em>
-</article>`;
-
-yield html`<article class="measure">
-  <h2>Animation</h2>
-  <p><em>Coming soon</em>
-</article>`;
-}
-
-function CurrentYear() {
-  return (new Date).getFullYear();
-}
-
-function* ContentInfo() {
-  yield html`<footer role=contentinfo class="measure">
-  <p>
-    <small>
-    © ${CurrentYear()} Patrick Smith
-    · <a href="https://icing.space/">Blog</a>
-    · <a href="https://twitter.com/concreteniche/">Twitter</a>
-    · <a href="https://github.com/RoyalIcing/">GitHub</a>
-    · <a href="https://github.com/RoyalIcing/regenerated.dev">View source</a>
-    · <a href="https://app.usefathom.com/share/ajddwzci/regenerated.dev">View analytics</a>
-    · <a href="https://components.guide">Components.Guide</a>
-    </small>
-</article>`;
-}
+// function CurrentYear() {
+//   return (new Date).getFullYear();
+// }
 
 function *PrismScript() {
   yield html`<!-- Prism syntax highlighting -->
@@ -390,36 +164,6 @@ function* SharedStyleElement() {
   yield html`</style>`;
 }
 
-async function HomePage() {
-  return renderHTML([
-    html`${Page.HtmlEn()} ${Meta.Title(`Regenerated.Dev`)}
-      <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-      <link rel="dns-prefetch" href="https://unpkg.com">
-      <link rel="dns-prefetch" href="https://cdn.skypack.dev">
-      ${SharedStyleElement()}
-      ${PrismScript()}
-      <script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>
-      <body>
-        <nav aria-label="Primary" class="measure" hidden>
-          <ul class>
-            <li><a href="/">Home</a></li>
-          </ul>
-        </nav>
-        <header role=banner class="measure -X-">
-          <h1>JavaScript Regenerated</h1>
-          <p><em>Rethinking JavaScript with Generator Functions.</em>
-        </header>
-        <main>
-        ${Articles()}
-        <div class="X -X-">
-          ${NewsletterForm()}
-        </div>
-        </main>
-        ${ContentInfo()}
-      `,
-  ]);
-}
-
 async function ArticlePage(url, { Primary, ClientModule }) {
   const clientModuleURL = `${url.pathname}.js`;
 
@@ -452,31 +196,6 @@ async function ArticlePage(url, { Primary, ClientModule }) {
         ${ContentInfo()}
       `,
   ]);
-}
-
-function mainJS() {
-  function* Inner() {
-    yield 1;
-    yield 2 * 2;
-    yield "hello world";
-  }
-  function* Example() {
-    yield 1;
-    yield 2 * 2;
-    yield "hello world";
-    yield Inner;
-  }
-  function Blah() {}
-  
-  const source = `
-  ${toCode(Example)}
-  // ${Example.name}
-  // ${Blah.name}
-  console.log(${Example.name});
-  console.log(Array.from(${Example.name}()));
-  `;
-  
-  return new Response(source, { headers: { 'content-type': contentTypes.javascript }});
 }
 
 function notFoundResponse(url, html = '') {
@@ -539,10 +258,6 @@ async function handleRequest(request) {
         return renderPage("pages/parsing.md", "pages/parsing.client.js")
       } else if (result.slug === 'pattern-matching') {
         return renderPage("pages/pattern-matching.md")
-      }
-
-      if (result.slug in pages) {
-        return new Response(await ArticlePage(url, pages[result.slug]), { headers: { 'content-type': contentTypes.html } });
       } else {
         return notFoundResponse(url);
       }
