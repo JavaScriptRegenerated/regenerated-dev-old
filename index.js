@@ -8,6 +8,7 @@ import { NewsletterForm } from './convertkit';
 
 const sha = 'bd6b0278a74a4c323777d7e3390d3be2866b6b73'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
+const jsdelivrURL = new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`)
 
 const contentTypes = {
   html: 'text/html;charset=UTF-8',
@@ -496,11 +497,16 @@ async function fetchContentHTML(path) {
   return res.text()
 }
 
-async function renderPage(path, ...extraHTML) {
+function renderModuleScript(path) {
+  const sourceURL = new URL(path, jsdelivrURL);
+  return `<script type=module src="${sourceURL}"></script>`
+}
+
+async function renderPage(path, clientPath) {
   return new Response(
     renderStyledHTML(
       `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
-      ...extraHTML,
+      clientPath ? renderModuleScript(clientPath) : '',
       await renderHTML(SharedStyleElement()),
       `<body>`,
       `<main>`,
@@ -530,7 +536,7 @@ async function handleRequest(request) {
       /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
     } else if (result.type === 'article') {
       if (result.slug === 'parsing') {
-        return renderPage("pages/parsing.md", `<script type=module src='${url.pathname}.js'></script>`)
+        return renderPage("pages/parsing.md", "pages/parsing.client.js")
       } else if (result.slug === 'pattern-matching') {
         return renderPage("pages/pattern-matching.md")
       }
