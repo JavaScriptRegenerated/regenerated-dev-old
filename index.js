@@ -6,7 +6,7 @@ import * as pages from './pages';
 import { CodeBlock } from './components';
 import { NewsletterForm } from './convertkit';
 
-const sha = '1c87cb21172670a9b61a91a26ba7c58f66a7e409'
+const sha = 'bd6b0278a74a4c323777d7e3390d3be2866b6b73'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 
 const contentTypes = {
@@ -371,6 +371,8 @@ function* SharedStyles() {
   
   yield 'em { font-style: italic; }';
 
+  yield 'input, textarea { color: black; }';
+
   yield '.measure { max-width: var(--measure); }';
   yield '.measure { --content-px: 1rem; }';
   yield '.measure:not(.measure *) { margin-left: auto; margin-right: auto; }';
@@ -494,10 +496,11 @@ async function fetchContentHTML(path) {
   return res.text()
 }
 
-async function fetchPage(path) {
+async function renderPage(path, ...extraHTML) {
   return new Response(
     renderStyledHTML(
       `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
+      ...extraHTML,
       await renderHTML(SharedStyleElement()),
       `<body>`,
       `<main>`,
@@ -522,14 +525,14 @@ async function handleRequest(request) {
     if (!success) {
       return notFoundResponse(url);
     } else if (result.type === 'home') {
-      return fetchPage("pages/home.md")
+      return renderPage("pages/home.md")
       /* return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } }); */
       /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
     } else if (result.type === 'article') {
       if (result.slug === 'parsing') {
-        return fetchPage("pages/parsing.md")
+        return renderPage("pages/parsing.md", `<script type=module src='${url.pathname}.js'></script>`)
       } else if (result.slug === 'pattern-matching') {
-        return fetchPage("pages/pattern-matching.md")
+        return renderPage("pages/pattern-matching.md")
       }
 
       if (result.slug in pages) {
