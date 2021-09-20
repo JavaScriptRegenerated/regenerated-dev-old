@@ -34,7 +34,9 @@ function apply() {
   console.log({ input });
   const output = parse(input, IPAddress());
   outputEl.textContent = JSON.stringify(output, null, 2);
-//   window.Prism.highlightElement(outputEl);
+  if (window.Prism) {
+    window.Prism.highlightElement(outputEl);
+  }
 }
 inputEl.addEventListener('input', {
   handleEvent(event) {

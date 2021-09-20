@@ -5,7 +5,7 @@ import { toCode } from 'scalemodel';
 import * as pages from './pages';
 import { NewsletterForm } from './convertkit';
 
-const sha = 'b611d7c362cc5de419c1cd2e5678bc06fb705d38'
+const sha = '6712159c848f02bcbe26d521057e7232451f1bfd'
 const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
 const jsdelivrURL = new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`)
 
@@ -21,7 +21,7 @@ function renderStyledHTML(...contentHTML) {
     `<html lang=en>`,
     `<meta charset=utf-8>`,
     `<meta name=viewport content="width=device-width, initial-scale=1.0">`,
-    // '<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">',
+    // '<link href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css" rel="stylesheet">',
     '<link href="https://unpkg.com/tailwindcss@^2/dist/base.min.css" rel="stylesheet">',
     '<link href="https://unpkg.com/highlight.js@11.2.0/styles/night-owl.css" rel="stylesheet">',
     `<style>
@@ -164,40 +164,6 @@ function* SharedStyleElement() {
   yield html`</style>`;
 }
 
-async function ArticlePage(url, { Primary, ClientModule }) {
-  const clientModuleURL = `${url.pathname}.js`;
-
-  return renderHTML([
-    html`${Page.HtmlEn()} ${Meta.Title(`Regenerated.Dev`)}
-      <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-      <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-      <link rel="dns-prefetch" href="https://unpkg.com">
-      <link rel="dns-prefetch" href="https://cdn.skypack.dev">
-      ${PrismScript()}
-      ${!!ClientModule && html`<script type=module src='${clientModuleURL}'></script>`}
-      <script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>
-      ${SharedStyleElement()}
-      <body>
-        <nav aria-label="Primary" class="measure" hidden>
-          <ul class>
-            <li><a href="/">Home</a></li>
-          </ul>
-        </nav>
-        <header role=banner class="measure X |X-X|" data-links="current-color underline-on-hover">
-          <div><a href="/">JavaScript Regenerated</a></div>
-          <p><em>Rethinking JavaScript with Generator Functions.</em>
-        </header>
-        <main>
-        ${Primary()}
-        <div class="X -X-">
-          ${NewsletterForm()}
-        </div>
-        </main>
-        ${ContentInfo()}
-      `,
-  ]);
-}
-
 function notFoundResponse(url, html = '') {
   return new Response(`Page not found: ${url.pathname}` + html, { status: 404, headers: { 'content-type': contentTypes.html } });
 }
@@ -227,6 +193,7 @@ async function renderPage(path, clientPath) {
       `<script src="https://cdn.usefathom.com/script.js" data-site="AJDDWZCI" defer></script>`,
       clientPath ? renderModuleScript(clientPath) : '',
       await renderHTML(SharedStyleElement()),
+      await renderHTML(PrismScript()),
       `<body>`,
       `<main>`,
       await fetchContentHTML(path),
