@@ -89,7 +89,6 @@ async function* chunkStyledHTML(makeContentHTML) {
 }
 
 function streamStyledHTML(makeContentHTML) {
-  console.log("streamStyledHTML")
   const encoder = new TextEncoder()
   const { readable, writable } = new TransformStream();
   const writer = writable.getWriter();
@@ -142,28 +141,6 @@ addEventListener('fetch', event => {
 // function CurrentYear() {
 //   return (new Date).getFullYear();
 // }
-
-const Page = {
-  *HtmlEn() {
-    yield html`<!doctype html>`
-    yield html`<html lang=en>`
-    yield html`<meta charset=utf-8>`
-    yield html`<meta name=viewport content="width=device-width">`
-  }
-}
-
-const Meta = {
-  *Title(text) {
-    yield html`<title>`;
-    yield text;
-    yield html`</title>`;
-  },
-};
-
-function fetchCSS(url) {
-  return fetch(url).then(res => res.text()).then(s => safe(s));
-  //return fetch(url).then(res => res.text());
-}
 
 function* SharedStyles() {
   yield ':root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }';
