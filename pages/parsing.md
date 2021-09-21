@@ -61,5 +61,41 @@ parse('1.2.3.256', IPAddress());
 ## Router
 
 ```js
-// Coming soon
+import { parse, mustEnd } from "yieldparser";
+
+function* Home() {
+  yield '/';
+  yield mustEnd;
+}
+
+function* About() {
+  yield '/about';
+  yield mustEnd;
+}
+
+function* About() {
+  yield '/about';
+  yield mustEnd;
+}
+```
+
+## Router
+
+```js
+import { parse, mustEnd } from "yieldparser";
+
+function* Home() {
+  yield '/';
+  yield mustEnd;
+}
+
+function* About() {
+  yield '/about';
+  yield mustEnd;
+}
+
+function* About() {
+  yield '/about';
+  yield mustEnd;
+}
 ```
