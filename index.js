@@ -14,7 +14,7 @@ const contentTypes = {
 
 const Stylesheets = {
   highlightNightOwl: "https://cdn.jsdelivr.net/npm/highlight.js@11.2.0/styles/night-owl.css",
-  highlightNightOwl: "https://unpkg.com/highlight.js@11.2.0/styles/night-owl.css",
+  // unpkgHighlightNightOwl: "https://unpkg.com/highlight.js@11.2.0/styles/night-owl.css",
   tailwindBase: "https://cdn.jsdelivr.net/npm/tailwindcss@^2/dist/base.min.css",
   tela: "https://cdn.jsdelivr.net/gh/RoyalIcing/tela@80ad30c8fa56fc6e1b7d3178d11c027a24bee5a2/tela.css",
   // "https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.0.0/modern-normalize.min.css"
@@ -192,8 +192,15 @@ function* SharedStyleElement() {
   yield html`</style>`;
 }
 
+const secureHTMLHeaders = {
+  'strict-transport-security': 'max-age=63072000',
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  /* 'x-xss-protection': '1; mode=block', */
+};
+
 function notFoundResponse(url, html = '') {
-  return new Response(`Page not found: ${url.pathname}` + html, { status: 404, headers: { 'content-type': contentTypes.html } });
+  return new Response(`Page not found: ${url.pathname}` + html, { status: 404, headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } });
 }
 
 async function fetchContentHTML(path) {
@@ -230,7 +237,7 @@ async function renderPage(event, url, path, clientPath, title) {
     ]);
 
     event.waitUntil(promise);
-    return new Response(stream, { headers: { 'content-type': contentTypes.html } });
+    return new Response(stream, { headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } });
   }
 
   return new Response(
@@ -243,7 +250,7 @@ async function renderPage(event, url, path, clientPath, title) {
       `</main>`,
       fetchContentHTML("pages/_footer.md"),
     ]),
-    { headers: { 'content-type': contentTypes.html } }
+    { headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } }
   );
 }
 
