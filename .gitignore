@@ -10,3 +10,4 @@ node_modules/
 .cargo-ok
 .envrc
 tmp/
+.DS_Store

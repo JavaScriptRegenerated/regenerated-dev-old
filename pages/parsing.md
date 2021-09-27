@@ -10,7 +10,7 @@ Library used: [yieldparser](https://github.com/RoyalIcing/yieldparser)
 </form>
 
 ```js
-import { parse } from "yieldparser";
+import { parse } from 'yieldparser';
 
 function* Digit() {
   const [digit] = yield /^\d+/;
@@ -58,44 +58,61 @@ parse('1.2.3.256', IPAddress());
 */
 ```
 
-## Router
+## Router: value approach
 
 ```js
-import { parse, mustEnd } from "yieldparser";
+import { parse, mustEnd } from 'yieldparser';
 
 function* Home() {
   yield '/';
   yield mustEnd;
+  return { type: 'home' };
 }
 
-function* About() {
-  yield '/about';
+function* Blog() {
+  yield '/blog';
   yield mustEnd;
+  return { type: 'blog' };
 }
 
-function* About() {
-  yield '/about';
+function* BlogPost() {
+  yield '/blog/';
+  const postID = yield /[-_\w]+/;
   yield mustEnd;
+  return { type: 'blogPost', postID };
 }
 ```
 
-## Router
+## Router: loader approach
 
 ```js
-import { parse, mustEnd } from "yieldparser";
+import { listPosts, findPost } from './blog';
 
 function* Home() {
   yield '/';
   yield mustEnd;
+
+  return {};
 }
 
-function* About() {
-  yield '/about';
+function* Blog() {
+  yield '/blog';
   yield mustEnd;
+
+  function fetchData() {
+    return listPosts();
+  }
+  return { fetchData };
 }
 
-function* About() {
-  yield '/about';
+function* BlogPost() {
+  yield '/blog/';
+  const postID = yield /[-_\w]+/;
   yield mustEnd;
+
+  function fetchData() {
+    return findPost(postID);
+  }
+  return { fetchData };
 }
 ```

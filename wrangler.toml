@@ -1,9 +1,20 @@
 name = "regenerated-dev"
+compatibility_date = "2021-09-26"
 type = "webpack"
-routes = ["regenerated.dev/*", "www.regenerated.dev/*"]
 zone_id = ""
 kv_namespaces = []
+
+[vars]
+PRODUCTION_LIKE = 0
+
+[env.production]
+# name = "regenerated-dev"
+routes = ["regenerated.dev/*", "www.regenerated.dev/*"]
+[env.production.vars]
+PRODUCTION_LIKE = 1
 
 [env.staging]
 name = "regenerated-dev-staging"
 route = "staging.regenerated.dev/*"
+[env.staging.vars]
+PRODUCTION_LIKE = 1

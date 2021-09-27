@@ -3,8 +3,16 @@ import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
 import { sha } from './shaState';
 
-const pressURL = new URL(`https://press.collected.workers.dev/1/github/RoyalIcing/regenerated.dev@${sha}/`)
-const jsdelivrURL = new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`)
+let devSHAs = {};
+if (PRODUCTION_LIKE !== '1') {
+  devSHAs = require('./sha.dev').devSHAs;
+}
+
+const config = Object.freeze({
+  pressGitHubURL: new URL(`https://collected.press/1/github/RoyalIcing/regenerated.dev@${sha}/`),
+  pressS3URL: new URL(`https://staging.collected.press/1/s3/object/us-west-2/collected-workspaces/`),
+  jsdelivrURL: new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`),
+})
 
 const contentTypes = {
   html: 'text/html;charset=UTF-8',
@@ -203,8 +211,8 @@ function notFoundResponse(url, html = '') {
   return new Response(`Page not found: ${url.pathname}` + html, { status: 404, headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } });
 }
 
-async function fetchContentHTML(path) {
-  const sourceURL = new URL(path, pressURL);
+async function fetchContentHTML(sourceURL) {
+  /* const sourceURL = new URL(path, config.pressGitHubURL); */
   const res = await fetch(sourceURL, {
     cf: {
       cacheTtlByStatus: { "200-299": 86400, 404: 1, "500-599": 0 },
@@ -217,23 +225,35 @@ async function fetchContentHTML(path) {
   return res.text()
 }
 
-function renderModuleScript(path) {
-  const sourceURL = new URL(path, jsdelivrURL);
+function pressGitHubURL(path) {
+  return new URL(path, config.pressGitHubURL);
+}
+
+function jsdelivrURL(path) {
+  return new URL(path, config.jsdelivrURL);
+}
+
+function pressS3URL(path) {
+  return new URL(path, config.pressS3URL);
+}
+
+function renderModuleScript(sourceURL) {
   return `<script type=module src="${sourceURL}"></script>`
 }
 
-async function renderPage(event, url, path, clientPath, title) {
-  if (url.searchParams.has('stream')) {
+async function renderPage(event, requestURL, contentURL, clientURL, title) {
+  console.log(contentURL.toString());
+  if (requestURL.searchParams.has('stream')) {
     console.log("will stream")
     const [stream, promise] = streamStyledHTML(() => [
       renderHTML([html`<title>`, title, html`</title>`]),
-      clientPath ? renderModuleScript(clientPath) : '',
+      clientURL ? renderModuleScript(clientURL) : '',
       `<body>`,
       `<p>Streaming!`,
       `<main>`,
-      fetchContentHTML(path),
+      fetchContentHTML(contentURL),
       `</main>`,
-      fetchContentHTML("pages/_footer.md"),
+      fetchContentHTML(pressGitHubURL("pages/_footer.md")),
     ]);
 
     event.waitUntil(promise);
@@ -243,12 +263,12 @@ async function renderPage(event, url, path, clientPath, title) {
   return new Response(
     await renderStyledHTML(() => [
       renderHTML([html`<title>`, title, html`</title>`]),
-      clientPath ? renderModuleScript(clientPath) : '',
+      clientURL ? renderModuleScript(clientURL) : '',
       `<body>`,
       `<main>`,
-      fetchContentHTML(path),
+      fetchContentHTML(contentURL),
       `</main>`,
-      fetchContentHTML("pages/_footer.md"),
+      fetchContentHTML(pressGitHubURL("pages/_footer.md")),
     ]),
     { headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } }
   );
@@ -266,22 +286,46 @@ async function handleRequest(request, event) {
 
   console.log('Go!')
   const render = renderPage.bind(null, event, url)
-  console.log('Go 2!')
+  console.log(result, devSHAs)
 
   if (!success) {
     return notFoundResponse(url);
   } else if (result.type === 'home') {
-    return render("pages/home.md", undefined, 'JavaScript Regenerated')
+    return render(pressGitHubURL("pages/home.md"), undefined, 'JavaScript Regenerated')
     /* return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } }); */
     /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
   } else if (result.type === 'article') {
     if (result.slug === 'parsing') {
-      return render("pages/parsing.md", "pages/parsing.client.js", 'JavaScript Regenerated: Parsing')
+      return render(pressGitHubURL("pages/parsing.md"), jsdelivrURL("pages/parsing.client.js"), 'JavaScript Regenerated: Parsing')
     } else if (result.slug === 'pattern-matching') {
-      return render("pages/pattern-matching.md", undefined, 'JavaScript Regenerated: Pattern Matching')
-    } else {
-      return notFoundResponse(url);
+      return render(pressGitHubURL("pages/pattern-matching.md"), undefined, 'JavaScript Regenerated: Pattern Matching')
+    } else if (result.slug === 'tela') {
+      return render(pressGitHubURL("pages/tela.md"), undefined, 'JavaScript Regenerated: TELA')
+    } else if (result.slug === 'machines') {
+      console.log(JSON.stringify(PRODUCTION_LIKE));
+      if (PRODUCTION_LIKE === '1') {
+        return render(pressGitHubURL("pages/machines.md"), undefined, 'JavaScript Regenerated: State Machines')
+      } else {
+        return render(
+          pressS3URL(`text/markdown/${devSHAs['pages/machines.md']}`),
+          `/article/${devSHAs['pages/machines.client.js']}.js`,
+          /* undefined, */
+          'JavaScript Regenerated: State Machines'
+        )
+        /* return fetch('https://staging.collected.press/1/s3/object/us-west-2/collected-workspaces/text/markdown/32b4f11a5fe3fd274ce2f0338d5d9af4e30c7e226f4923f510d43410119c0855') */
+      }
     }
-    /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
+  } else if (result.type === 'articleModule') {
+    if (PRODUCTION_LIKE === '1') {
+      return fetch(jsdelivrURL("pages/${result.slug}.js"))
+    } else {
+      const sourceURL = pressS3URL(`application/javascript/${result.slug}`);
+      console.log("FETCHING", sourceURL.toString())
+      return fetch(sourceURL)
+      /* return fetch('https://staging.collected.press/1/s3/object/us-west-2/collected-workspaces/text/markdown/32b4f11a5fe3fd274ce2f0338d5d9af4e30c7e226f4923f510d43410119c0855') */
+    }
+  } else {
+    return notFoundResponse(url);
   }
+    /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
 }
