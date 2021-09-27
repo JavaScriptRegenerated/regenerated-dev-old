@@ -6,14 +6,16 @@
   "main": "index.js",
   "scripts": {
     "start": "wrangler dev",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "playwright test",
     "format": "prettier --write '**/*.{js,css,json,md}'"
   },
   "author": "Patrick Smith <pgwsmith@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@cloudflare/wrangler": "^1.15.0",
-    "@playwright/test": "^0.1101.0",
+    "@cloudflare/wrangler": "^1.19.3",
+    "@playwright/test": "^1.15.0",
+    "aws4fetch": "^1.0.13",
+    "miniflare": "^1.4.1",
     "prettier": "^1.19.1"
   },
   "dependencies": {
