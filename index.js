@@ -1,7 +1,7 @@
 import { renderToString as renderHTML, html, safe } from 'yieldmarkup';
 import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
-import { sha } from './shaState';
+import { sha } from './sha';
 
 let devSHAs = {};
 if (PRODUCTION_LIKE !== '1') {
