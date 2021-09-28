@@ -304,7 +304,7 @@ async function handleRequest(request, event) {
     } else if (result.slug === 'machines') {
       console.log(JSON.stringify(PRODUCTION_LIKE));
       if (PRODUCTION_LIKE === '1') {
-        return render(pressGitHubURL("pages/machines.md"), undefined, 'JavaScript Regenerated: State Machines')
+        return render(pressGitHubURL("pages/machines.md"), jsdelivrURL("pages/machines.client.js"), 'JavaScript Regenerated: State Machines')
       } else {
         return render(
           pressS3URL(`text/markdown/${devSHAs['pages/machines.md']}`),
@@ -317,7 +317,7 @@ async function handleRequest(request, event) {
     }
   } else if (result.type === 'articleModule') {
     if (PRODUCTION_LIKE === '1') {
-      return fetch(jsdelivrURL("pages/${result.slug}.js"))
+      return fetch(jsdelivrURL(`pages/${result.slug}.js`))
     } else {
       const sourceURL = pressS3URL(`application/javascript/${result.slug}`);
       console.log("FETCHING", sourceURL.toString())
