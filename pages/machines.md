@@ -1,7 +1,10 @@
 # Designing State Machines with YieldMachine
 
 <template id=examples-template>
-    <style>:host { display: block; padding: 1rem; }</style>
+    <style>
+        :host { display: block; padding: 1rem; }
+        button { color: white; background: #222; border-radius: 999px; }
+    </style>
     <output><slot name=result><pre data-result></pre></slot></output>
     <slot name=mainElement></slot>
 </template>
