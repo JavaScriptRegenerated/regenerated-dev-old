@@ -72,10 +72,13 @@ class MachinesExample extends HTMLElement {
     shadowRoot.appendChild(clone);
     const [mainElement] = shadowRoot.querySelector('slot[name=mainElement]').assignedElements();
     const [outputEl] = shadowRoot.querySelector('slot[name=result]').assignedElements({ flatten: true });
-
-    // const machine = start(ClickedState.bind(null, mainElement));
+    
     const machineName = this.getAttribute('machine');
-    const machine = start(machineRegistry.get(machineName).bind(null, mainElement));
+    const machineDefinition = machineRegistry.get(machineName);
+    if (!machineDefinition) {
+      console.error("No machine defined with name", machineName);
+    }
+    const machine = start(machineDefinition.bind(null, mainElement));
     
     machine.signal.addEventListener('StateChanged', this);
     
