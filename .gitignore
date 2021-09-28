@@ -11,3 +11,4 @@ node_modules/
 .envrc
 tmp/
 .DS_Store
+sha.js

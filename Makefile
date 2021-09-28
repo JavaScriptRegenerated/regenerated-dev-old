@@ -4,26 +4,26 @@ install: package-lock.json
 	npm ci
 
 dev: install
-	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npm start
+	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npm start
 	# npx miniflare index.js --watch --debug
 	
-production: shaState.js
-	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish
+production: sha.js
+	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish
 
-staging: clean shaState.js
-	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish --env staging
+staging: clean sha.js
+	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish --env staging
 
-preview: clean shaState.js
-	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler preview --watch
+preview: clean sha.js
+	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler preview --watch
 
 logs_production:
-	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail
+	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail
 
 logs_staging:
-	CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail --env staging
+	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail --env staging
 
 clean:
-	rm -rf dist/ worker/
+	@rm -rf dist/ worker/
 
 s3_ls:
 	@AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) aws s3 ls
@@ -69,5 +69,5 @@ tmp/$(LATEST_SHA):
 	@touch tmp/$(LATEST_SHA)
 	@echo "Latest sha: $(LATEST_SHA)"
 
-shaState.js: tmp/$(LATEST_SHA)
-	@echo "export const sha = '$(LATEST_SHA)'" > shaState.js
+sha.js: tmp/$(LATEST_SHA)
+	@echo "export const sha = '$(LATEST_SHA)'" > sha.js
