@@ -1,17 +1,18 @@
 import {
   start,
   on,
+  compound,
   listenTo,
   entry,
   cond,
   always,
-  accumulate
-} from 'https://cdn.jsdelivr.net/npm/yieldmachine@0.4.8/dist/yieldmachine.mjs';
+  accumulate,
+} from 'https://cdn.jsdelivr.net/npm/yieldmachine@0.4.9/dist/yieldmachine.mjs';
 
 function ClickedState(button) {
   function* Initial() {
-    yield on("click", Clicked);
-    yield listenTo(button, "click");
+    yield on('click', Clicked);
+    yield listenTo(button, 'click');
   }
   function* Clicked() {}
 
@@ -24,52 +25,74 @@ function FocusState(el) {
     yield always(Inactive);
   }
   function* Active() {
-    yield listenTo(el.ownerDocument, "focusin");
-    yield listenTo(el, "blur");
-    yield on("focusin", CheckingStillActive);
-    yield on("blur", CheckingStillActive);
+    yield listenTo(el.ownerDocument, 'focusin');
+    yield listenTo(el, 'blur');
+    yield on('focusin', CheckingStillActive);
+    yield on('blur', CheckingStillActive);
 
     // yield on(listenTo(el.ownerDocument, "focusin"), CheckingStillActive);
   }
   function* Inactive() {
-    yield listenTo(el, "focus");
-    yield on("focus", Active);
+    yield listenTo(el, 'focus');
+    yield on('focus', Active);
   }
 
   return Inactive;
 }
 
-clickController(document.getElementById('click-example'));
-focusController(document.getElementById('focus-example'));
+function* DetailsListener(el) {
+  yield listenTo(el, ['toggle']);
+  yield on('toggle', compound(CheckingOpen));
 
-function clickController(el) {
-  const clickButton = el.querySelector('[data-action]');
-  const outputEl = el.querySelector('[data-result]');
-  const machine = start(ClickedState.bind(null, clickButton));
-
-  function update() {
-    outputEl.textContent = machine.current;
+  function* Closed() {}
+  function* Open() {}
+  function* CheckingOpen() {
+    yield cond(el.open, Open);
+    yield always(Closed);
   }
 
-  machine.signal.addEventListener('StateChanged', (event) => {
-    update();
-  });
-
-  update();
+  return CheckingOpen;
 }
 
-function focusController(el) {
-  const textbox = el.querySelector('[data-target]');
-  const outputEl = el.querySelector('[data-result]');
-  const machine = start(FocusState.bind(null, textbox));
+const machineRegistry = new Map();
+machineRegistry.set('ClickedState', ClickedState);
+machineRegistry.set('FocusState', FocusState);
+machineRegistry.set('DetailsListener', DetailsListener);
 
-  function update() {
-    outputEl.textContent = machine.current;
+class MachinesExample extends HTMLElement {
+  constructor() {
+    super();
+
+    const templateEl = document.getElementById('examples-template');
+    const template = templateEl.content;
+    const clone = template.cloneNode(true);
+    // const clone = this.ownerDocument.importNode(template, true);
+    // const clone = this.ownerDocument.createRange().createContextualFragment(templateEl.innerHTML);
+    const shadowRoot = this.attachShadow({ mode: 'open' });
+    shadowRoot.appendChild(clone);
+    const [mainElement] = shadowRoot.querySelector('slot[name=mainElement]').assignedElements();
+    const [outputEl] = shadowRoot.querySelector('slot[name=result]').assignedElements({ flatten: true });
+
+    // const machine = start(ClickedState.bind(null, mainElement));
+    const machineName = this.getAttribute('machine');
+    const machine = start(machineRegistry.get(machineName).bind(null, mainElement));
+    
+    machine.signal.addEventListener('StateChanged', this);
+    
+    Object.assign(this, { machine, outputEl });
+    Object.preventExtensions(this);
+  }
+  
+  connectedCallback() {
+    this.update();
   }
 
-  machine.signal.addEventListener('StateChanged', (event) => {
-    update();
-  });
+  handleEvent(event) {
+    this.update();
+  }
 
-  update();
+  update() {
+    this.outputEl.textContent = this.machine.current;
+  }
 }
+customElements.define('machines-example', MachinesExample);
