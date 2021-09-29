@@ -1,6 +1,7 @@
 import { renderToString as renderHTML, html, safe } from 'yieldmarkup';
 import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
+import { IconElementHandler } from './view/icons';
 import { sha } from './sha';
 
 let devSHAs = {};
@@ -291,7 +292,14 @@ async function handleRequest(request, event) {
   if (!success) {
     return notFoundResponse(url);
   } else if (result.type === 'home') {
-    return render(pressGitHubURL("pages/home.md"), undefined, 'JavaScript Regenerated')
+    if (url.searchParams.has('icons')) {
+      const res = render(pressGitHubURL("pages/home.md"), undefined, 'JavaScript Regenerated');
+      const rewriter = new HTMLRewriter();
+      IconElementHandler.addToRewriter(rewriter);
+      return rewriter.transform(res);
+    } else {
+      return render(pressGitHubURL("pages/home.md"), undefined, 'JavaScript Regenerated')
+    }
     /* return new Response(await HomePage(), { headers: { 'content-type': contentTypes.html } }); */
     /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
   } else if (result.type === 'article') {
