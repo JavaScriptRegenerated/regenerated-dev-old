@@ -299,6 +299,10 @@ async function handleRequest(request, event) {
       return render(pressGitHubURL("pages/parsing.md"), jsdelivrURL("pages/parsing.client.js"), 'JavaScript Regenerated: Parsing')
     } else if (result.slug === 'pattern-matching') {
       return render(pressGitHubURL("pages/pattern-matching.md"), undefined, 'JavaScript Regenerated: Pattern Matching')
+    } else if (result.slug === 'markup') {
+      return render(pressGitHubURL("pages/markup.md"), undefined, 'JavaScript Regenerated: Rendering HTML Markup')
+    } else if (result.slug === 'control-the-flow') {
+      return render(pressGitHubURL("pages/control-the-flow.md"), undefined, 'JavaScript Regenerated: Control The Flow')
     } else if (result.slug === 'tela') {
       return render(pressGitHubURL("pages/tela.md"), undefined, 'JavaScript Regenerated: TELA')
     } else if (result.slug === 'machines') {
