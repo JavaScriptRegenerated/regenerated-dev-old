@@ -50,6 +50,12 @@ export class IconElementHandler {
     if (element.hasAttribute('height')) {
       wrapperSVGAttributes.push(`height="${element.getAttribute('height')}"`)
     }
+    if (element.hasAttribute('x')) {
+      wrapperSVGAttributes.push(`x="${element.getAttribute('x')}"`)
+    }
+    if (element.hasAttribute('y')) {
+      wrapperSVGAttributes.push(`y="${element.getAttribute('y')}"`)
+    }
 
     const wrapperSVG = `<svg ${wrapperSVGAttributes.join(' ')}>${iconSource}</svg>`
     element.replace(wrapperSVG, { html: true });

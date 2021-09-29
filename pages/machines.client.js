@@ -7,7 +7,7 @@ import {
   cond,
   always,
   accumulate,
-} from 'https://cdn.jsdelivr.net/npm/yieldmachine@0.4.9/dist/yieldmachine.mjs';
+} from 'https://cdn.jsdelivr.net/npm/yieldmachine@0.4.10/dist/yieldmachine.mjs';
 
 function ClickedState(button) {
   function* Initial() {

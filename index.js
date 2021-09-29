@@ -2,7 +2,7 @@ import { renderToString as renderHTML, html, safe } from 'yieldmarkup';
 import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
 import { IconElementHandler } from './view/icons';
-import { sha } from './sha';
+import { sha, yieldmachineSha } from './sha';
 
 let devSHAs = {};
 if (PRODUCTION_LIKE !== '1') {
@@ -13,6 +13,7 @@ const config = Object.freeze({
   pressGitHubURL: new URL(`https://collected.press/1/github/RoyalIcing/regenerated.dev@${sha}/`),
   pressS3URL: new URL(`https://staging.collected.press/1/s3/object/us-west-2/collected-workspaces/`),
   jsdelivrURL: new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`),
+  pressYieldmachineURL: new URL(`https://collected.press/1/github/RoyalIcing/yieldmachine@${yieldmachineSha}/`),
 })
 
 const contentTypes = {
@@ -135,8 +136,13 @@ function* PathParser() {
     const [, slug] = yield /^([^\/]+)$/;
     return { type: 'article', slug };
   }
+  function* YieldmachinePage() {
+    yield '/yieldmachine';
+    yield mustEnd;
+    return { type: 'press', url: new URL("readme.md", config.pressYieldmachineURL), title: 'Yield Machine' };
+  }
   
-  return yield [Home, ArticleModule, ArticlePage];
+  return yield [Home, ArticleModule, ArticlePage, YieldmachinePage];
 }
 
 function parsePath(path) {
@@ -338,6 +344,8 @@ async function handleRequest(request, event) {
       return fetch(sourceURL)
       /* return fetch('https://staging.collected.press/1/s3/object/us-west-2/collected-workspaces/text/markdown/32b4f11a5fe3fd274ce2f0338d5d9af4e30c7e226f4923f510d43410119c0855') */
     }
+  } else if (result.type === 'press') {
+    return render(result.url, undefined, result.title)
   } else {
     return notFoundResponse(url);
   }
