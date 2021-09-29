@@ -1,6 +1,10 @@
 export function fetchGitHubIcon(repo, version, path) {
   return fetch(`https://cdn.jsdelivr.net/gh/${repo}@${version}${path}`, {
-    cache: 'force-cache',
+    // cache: 'force-cache',
+    cf: {
+      cacheTtlByStatus: { "200-299": 86400, 404: 1, "500-599": 0 },
+      cacheEverything: true,
+    }
   }).then(res => res.text());
 }
 
@@ -26,16 +30,24 @@ export class IconElementHandler {
   }
 
   async element(element) {
+    const iconName = element.getAttribute('name');
+    const width = element.getAttribute('width');
+    let iconSource;
+
+    console.log('element', element);
     if (element.tagName === 'simple-icon') {
-      const iconName = element.getAttribute('name');
-      const source = await fetchSimpleIcon(iconName);
-      element.replace(source, { html: true });
+      iconSource = await fetchSimpleIcon(iconName);
     } else if (element.tagName === 'hero-icon') {
-      const iconName = element.getAttribute('name');
-      const source = await fetchHeroIcon(iconName);
-      element.replace(source, { html: true });
-    } else {
+      iconSource = await fetchHeroIcon(iconName);
+    }
+
+    if (iconSource === undefined) {
       return;
+    }
+
+    const iconElement = element.replace(iconSource, { html: true });
+    if (width !== undefined) {
+      iconElement.setAttribute('width', width);
     }
   }
 }

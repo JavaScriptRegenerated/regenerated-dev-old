@@ -293,7 +293,7 @@ async function handleRequest(request, event) {
     return notFoundResponse(url);
   } else if (result.type === 'home') {
     if (url.searchParams.has('icons')) {
-      const res = render(pressGitHubURL("pages/home.md"), undefined, 'JavaScript Regenerated');
+      const res = await render(pressGitHubURL("pages/home.md"), undefined, 'JavaScript Regenerated');
       const rewriter = new HTMLRewriter();
       IconElementHandler.addToRewriter(rewriter);
       return rewriter.transform(res);
