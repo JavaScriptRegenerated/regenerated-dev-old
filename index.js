@@ -261,6 +261,7 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
       fetchContentHTML(contentURL),
       `</main>`,
       fetchContentHTML(pressGitHubURL("pages/_footer.md")),
+      `<small>${sha}</small>`
     ]);
 
     event.waitUntil(promise);
@@ -276,6 +277,7 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
       fetchContentHTML(contentURL),
       `</main>`,
       fetchContentHTML(pressGitHubURL("pages/_footer.md")),
+      `<small>${sha}</small>`,
     ]),
     { headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } }
   );
