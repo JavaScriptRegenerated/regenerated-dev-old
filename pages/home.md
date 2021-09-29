@@ -1,6 +1,6 @@
 # JavaScript Regenerated
 
-<hero-icon name="solid/chat-alt-2.svg" width="40"></hero-icon>
+<hero-icon name="solid/chat-alt-2.svg" width="40" height="40"></hero-icon>
 
 _Using components in more places with generator functions._
 ## [State Machines](/article/machines)

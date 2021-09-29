@@ -31,10 +31,8 @@ export class IconElementHandler {
 
   async element(element) {
     const iconName = element.getAttribute('name');
-    const width = element.getAttribute('width');
     let iconSource;
 
-    console.log('element', element);
     if (element.tagName === 'simple-icon') {
       iconSource = await fetchSimpleIcon(iconName);
     } else if (element.tagName === 'hero-icon') {
@@ -45,9 +43,15 @@ export class IconElementHandler {
       return;
     }
 
-    const iconElement = element.replace(iconSource, { html: true });
-    if (width !== undefined) {
-      iconElement.setAttribute('width', width);
+    let wrapperSVGAttributes = [];
+    if (element.hasAttribute('width')) {
+      wrapperSVGAttributes.push(`width="${element.getAttribute('width')}"`)
     }
+    if (element.hasAttribute('height')) {
+      wrapperSVGAttributes.push(`height="${element.getAttribute('height')}"`)
+    }
+
+    const wrapperSVG = `<svg ${wrapperSVGAttributes.join(' ')}>${iconSource}</svg>`
+    element.replace(wrapperSVG, { html: true });
   }
 }
