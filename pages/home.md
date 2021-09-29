@@ -1,6 +1,6 @@
 # JavaScript Regenerated
 
-_Rethinking JavaScript with Generator Functions._
+_Using components in more places with generator functions._
 ## [State Machines](/article/machines)
 
 ## [Parsing](/article/parsing)
