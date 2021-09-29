@@ -1,12 +1,13 @@
 # JavaScript Regenerated
 
 _Rethinking JavaScript with Generator Functions._
+## [State Machines](/article/machines)
 
 ## [Parsing](/article/parsing)
 
-## [Pattern Matching](/article/pattern-matching)
+## [Routing](/article/routing)
 
-## [State Machines](/article/machines)
+## [Pattern Matching](/article/pattern-matching)
 
 ## [Rendering HTML](/article/markup)
 
