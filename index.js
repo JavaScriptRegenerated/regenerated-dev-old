@@ -107,6 +107,7 @@ function streamStyledHTML(makeContentHTML) {
     for await (const chunk of chunkStyledHTML(makeContentHTML)) {
       await writer.write(encoder.encode(chunk));
     }
+    await writer.close();
   }
 
   return [readable, performWrite()];
