@@ -158,54 +158,50 @@ addEventListener('fetch', event => {
 //   return (new Date).getFullYear();
 // }
 
-function* SharedStyles() {
-  yield ':root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }';
-  yield ':root { background: #1a1f30; color: white }';
-  yield ':root { --measure: 44rem; --link-color: #00b4ff; }';
-  yield ':root { --highlight-code-bg: #011627; }';
-
-  yield '*, *:before, *:after { font: inherit; margin: 0; padding: 0; }';
-  yield '* { --py: 0; --px: 0; padding-top: var(--py); padding-bottom: var(--py); padding-left: var(--px); padding-right: var(--px); }';
-
-  yield 'a { color: var(--link-color); }';
-
-  yield 'nav { margin: 1rem; }';
-  yield 'header[role=banner] { margin: 2rem 1rem; }';
-  yield 'article { margin: 4rem 1rem; }';
-
-  yield 'h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }';
-  yield 'input[type="text"] { padding-left: 0.25rem; }';
-
-  yield 'h1 { font-size: 2rem; line-height: 1.2; font-weight: bold; margin-bottom: 1rem; }';
-  yield 'h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }';
-  yield 'h3 { font-size: 1.375rem; font-weight: bold; margin-bottom: 1rem; }';
-  
-  yield 'p { margin: 1rem 0; }';
-  yield 'pre { font-size: 0.8rem; }';
-
-  yield 'dl { display: grid; grid-template-columns: minmax(min-content, auto) max-content; }';
-  yield 'dt { font-weight: bold; }';
-  yield 'dd { text-align: "." center; }';
-  yield 'ul[class], ol[class] { list-style: none; }';
-  
-  yield 'em { font-style: italic; }';
-
-  yield 'input, textarea { color: black; }';
-
-  yield '.measure { max-width: var(--measure); }';
-  yield '.measure { --content-px: 1rem; }';
-  yield '.measure:not(.measure *) { margin-left: auto; margin-right: auto; }';
-
-  yield '.row { display: flex; flex-wrap: wrap; }';
-  yield '.-X- { text-align: center; }';
-  
-  yield '.formkit-form { border: none !important; margin-bottom: 2rem; }';
-}
-
 function* SharedStyleElement() {
-  yield html`<style>`;
-  yield safe(Array.from(SharedStyles()).join('\n'));
-  yield html`</style>`;
+  yield html`<style>
+  :root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+  :root { background: #1a1f30; color: white }
+  :root { --measure: 44rem; --link-color: #00b4ff; }
+  :root { --highlight-code-bg: #011627; }
+
+  *, *:before, *:after { font: inherit; margin: 0; padding: 0; }
+  * { --py: 0; --px: 0; padding-top: var(--py); padding-bottom: var(--py); padding-left: var(--px); padding-right: var(--px); }
+
+  a { color: var(--link-color); }
+
+  nav { margin: 1rem; }
+  header[role=banner] { margin: 2rem 1rem; }
+  article { margin: 4rem 1rem; }
+
+  h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }
+  input[type="text"] { padding-left: 0.25rem; }
+
+  h1 { font-size: 2rem; line-height: 1.2; font-weight: bold; margin-bottom: 1rem; }
+  h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
+  h3 { font-size: 1.375rem; font-weight: bold; margin-bottom: 1rem; }
+  
+  p { margin: 1rem 0; }
+  pre { font-size: 0.8rem; }
+
+  dl { display: grid; grid-template-columns: minmax(min-content, auto) max-content; }
+  dt { font-weight: bold; }
+  dd { text-align: "." center; }
+  ul[class], ol[class] { list-style: none; }
+  
+  em { font-style: italic; }
+
+  input, textarea { color: black; }
+
+  .measure { max-width: var(--measure); }
+  .measure { --content-px: 1rem; }
+  .measure:not(.measure *) { margin-left: auto; margin-right: auto; }
+
+  .row { display: flex; flex-wrap: wrap; }
+  .-X- { text-align: center; }
+  
+  .formkit-form { border: none !important; margin-bottom: 2rem; }
+  </style>`;
 }
 
 const secureHTMLHeaders = {
@@ -277,8 +273,10 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
       `<main>`,
       fetchContentHTML(contentURL),
       `</main>`,
+      `<footer role=contentinfo>`,
       fetchContentHTML(pressGitHubURL("pages/_footer.md")),
       `<small>${sha}</small>`,
+      `</footer>`,
     ]),
     { headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } }
   );

@@ -3,6 +3,7 @@ compatibility_date = "2021-09-26"
 type = "webpack"
 zone_id = ""
 kv_namespaces = []
+workers_dev = true
 
 [vars]
 PRODUCTION_LIKE = 0
@@ -10,11 +11,13 @@ PRODUCTION_LIKE = 0
 [env.production]
 # name = "regenerated-dev"
 routes = ["regenerated.dev/*", "www.regenerated.dev/*"]
+workers_dev = false
 [env.production.vars]
 PRODUCTION_LIKE = 1
 
 [env.staging]
 name = "regenerated-dev-staging"
 route = "staging.regenerated.dev/*"
+workers_dev = false
 [env.staging.vars]
 PRODUCTION_LIKE = 1
