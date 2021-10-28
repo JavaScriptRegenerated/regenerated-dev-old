@@ -3,7 +3,7 @@
 <template id=examples-template>
     <style>
         :host { display: block; padding: 1rem; }
-        [data-result] { background: #fff3; }
+        [data-result] { padding: 0.25em 0.5em; background: #fff3; border-radius: 4px; }
     </style>
     <output><slot name=result><code data-result>loading…</code></slot></output>
     <slot name=mainElement></slot>
@@ -104,7 +104,7 @@ function FocusState(el) {
     yield on('focus', Active);
   }
 
-  return Inactive;
+  return CheckingStillActive;
 }
 ```
 

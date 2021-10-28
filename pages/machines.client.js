@@ -37,7 +37,7 @@ function FocusState(el) {
     yield on('focus', Active);
   }
 
-  return Inactive;
+  return CheckingStillActive;
 }
 
 function* DetailsListener(el) {
