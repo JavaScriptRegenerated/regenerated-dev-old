@@ -3,9 +3,9 @@
 <template id=examples-template>
     <style>
         :host { display: block; padding: 1rem; }
-        button { color: white; background: #222; border-radius: 999px; }
+        [data-result] { background: #fff3; }
     </style>
-    <output><slot name=result><pre data-result></pre></slot></output>
+    <output><slot name=result><code data-result></code></slot></output>
     <slot name=mainElement></slot>
 </template>
 

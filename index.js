@@ -193,6 +193,7 @@ function* SharedStyleElement() {
   em { font-style: italic; }
 
   input, textarea { color: black; }
+  button { padding: 0.25em 0.5em; color: black; background: var(--link-color); border-radius: 999em; }
 
   .measure { max-width: var(--measure); }
   .measure { --content-px: 1rem; }
@@ -200,6 +201,8 @@ function* SharedStyleElement() {
 
   .row { display: flex; flex-wrap: wrap; }
   .-X- { text-align: center; }
+
+  machines-example { padding: 1rem; border: 1px solid #fff5; }
   
   .formkit-form { border: none !important; margin-bottom: 2rem; }
   </style>`;
