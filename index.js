@@ -202,7 +202,8 @@ function* SharedStyleElement() {
   .row { display: flex; flex-wrap: wrap; }
   .-X- { text-align: center; }
 
-  machines-example { padding: 1rem; border: 1px solid #fff5; }
+  machines-example { display: flex; justify-content: space-around ; justify-content: space-evenly; align-items: center; padding: 1rem; border: 1px solid #fff5; }
+  [data-result] { background: pink; }
   
   .formkit-form { border: none !important; margin-bottom: 2rem; }
   </style>`;

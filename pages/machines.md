@@ -5,7 +5,7 @@
         :host { display: block; padding: 1rem; }
         [data-result] { background: #fff3; }
     </style>
-    <output><slot name=result><code data-result></code></slot></output>
+    <output><slot name=result><code data-result>loading…</code></slot></output>
     <slot name=mainElement></slot>
 </template>
 
