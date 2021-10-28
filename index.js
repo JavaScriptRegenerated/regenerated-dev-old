@@ -37,7 +37,7 @@ const ExternalScripts = {
   },
   prismAutoloader: {
     src: "https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js",
-    integrity: "sha512-ROhjG07IRaPZsryG77+MVyx3ZT5q3sGEGENoGItwc9xgvx+dl+s3D8Ob1zPdbl/iKklMKp7uFemLJFDRw0bvig=="
+    integrity: "sha512-ROhjG07IRaPZsryG77+MVyx3ZT5q3sGEGENoGI   c9xgvx+dl+s3D8Ob1zPdbl/iKklMKp7uFemLJFDRw0bvig=="
   },
   highlightJS: {
     src: "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.2.0/highlight.min.js",
@@ -59,7 +59,7 @@ function *PrismScript() {
 }
 
 async function* chunkStyledHTML(makeContentHTML) {
-  yield * [
+  yield* [
     `<!doctype html>`,
     `<html lang=en>`,
     `<meta charset=utf-8>`,
@@ -73,29 +73,11 @@ async function* chunkStyledHTML(makeContentHTML) {
     `<link href="${Stylesheets.tela}" rel="stylesheet">`,
     `<script defer src="${ExternalScripts.highlightJS.src}"></script>`,
     `<script defer src="${ExternalScripts.highlightJSLanguageJSON.src}"></script>`,
-    `<style>
-    body { max-width: 50rem; margin: auto; padding: calc(1rem + 1vh + 1vw) 1rem; }
-    a:hover { text-decoration: underline; }
-    p, ul, ol, pre, hr, blockquote, h1, h2, h3, h4, h5, h6 { margin-bottom: 1rem; }
-    h1 { font-size: 2em; font-weight: 600; }
-    h2 { font-size: 1.5em; font-weight: 600; }
-    h3 { font-size: 1.25em; font-weight: 600; }
-    h4 { font-size: 1em; font-weight: 600; }
-    h5 { font-size: .875em; font-weight: 600; }
-    h6 { font-size: .85em; font-weight: 600; }
-    img { display: inline-block; }
-    article ul { list-style: inside; }
-    nav ul { display: flex; flex-wrap: wrap; }
-    nav a { display: inline-block; padding: 0.5em; background: #f5f5f5; }
-    nav a { border: 1px solid #e5e5e5; }
-    nav li:not(:first-child) a { border-left: none; }
-    nav a:hover { background: #e9e9e9; border-color: #ddd; }
-    </style>`,
-  ]
-  
-  yield renderHTML(SharedStyleElement())
+  ];
 
-  yield *makeContentHTML()
+  yield renderHTML(SharedStyleElement());
+
+  yield* makeContentHTML();
 }
 
 function streamStyledHTML(makeContentHTML) {
@@ -161,17 +143,35 @@ addEventListener('fetch', event => {
 function* SharedStyleElement() {
   yield html`<style>
   :root { font-size: 125%; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
-  :root { background: #1a1f30; color: white }
+  :root { background: #0b1021; color: white }
   :root { --measure: 44rem; --link-color: #00b4ff; }
   :root { --highlight-code-bg: #011627; }
 
   *, *:before, *:after { font: inherit; margin: 0; padding: 0; }
   * { --py: 0; --px: 0; padding-top: var(--py); padding-bottom: var(--py); padding-left: var(--px); padding-right: var(--px); }
 
-  a { color: var(--link-color); }
+  main, footer[role=contentinfo] { max-width: 50rem; margin: auto; padding: calc(1rem + 1vh + 1vw) 1rem; }
+
+  a { color: var(--link-color); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  p, ul, ol, pre, hr, blockquote, h1, h2, h3, h4, h5, h6 { margin-bottom: 1rem; }
+  h1 { font-size: 2em; font-weight: 600; }
+  h2 { font-size: 1.5em; font-weight: 600; }
+  h3 { font-size: 1.25em; font-weight: 600; }
+  h4 { font-size: 1em; font-weight: 600; }
+  h5 { font-size: .875em; font-weight: 600; }
+  h6 { font-size: .85em; font-weight: 600; }
+  img { display: inline-block; }
+  article ul { list-style: inside; }
+  nav ul { display: flex; flex-wrap: wrap; }
+  nav li[role=separator] { margin: auto; }
+  /*nav a { display: inline-block; padding: 0.5em; background: #f5f5f5; }
+  nav a { border: 1px solid #e5e5e5; }
+  nav li:not(:first-child) a { border-left: none; }
+  nav a:hover { background: #e9e9e9; border-color: #ddd; }*/
 
   nav { margin: 1rem; }
-  header[role=banner] { margin: 2rem 1rem; }
+  header[role=banner] { padding: 0.25rem 0.5rem; background: #000018; --link-color: white; text-transform: uppercase; font-weight: bold; }
   article { margin: 4rem 1rem; }
   footer[role=contentinfo] { padding-top: 4rem; font-size: 0.875rem; }
 
@@ -250,6 +250,19 @@ function renderModuleScript(sourceURL) {
   return `<script type=module src="${sourceURL}"></script>`
 }
 
+function renderBanner() {
+  return `
+<header role=banner>
+<nav aria-label=Primary>
+<ul>
+<li><a href=/>JavaScript Regenerated</a>
+<li role=separator>
+<li><a href="https://twitter.com/royalicing/">by royalicing</a>
+</nav>
+</header>
+`;
+}
+
 async function renderPage(event, requestURL, contentURL, clientURL, title) {
   console.log(contentURL.toString());
   if (requestURL.searchParams.has('stream')) {
@@ -258,6 +271,7 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
       renderHTML([html`<title>`, title, html`</title>`]),
       clientURL ? renderModuleScript(clientURL) : '',
       `<body>`,
+      renderBanner(),
       `<p>Streaming!`,
       `<main>`,
       fetchContentHTML(contentURL),
@@ -275,6 +289,7 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
       renderHTML([html`<title>`, title, html`</title>`]),
       clientURL ? renderModuleScript(clientURL) : '',
       `<body>`,
+      renderBanner(),
       `<main>`,
       fetchContentHTML(contentURL),
       `</main>`,
