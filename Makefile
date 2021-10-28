@@ -3,6 +3,11 @@ include .envrc
 install: package-lock.json
 	npm ci
 
+latest:
+	git pull -r
+	git push
+	$(MAKE) sha.js
+
 dev: install
 	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npm start
 	# npx miniflare index.js --watch --debug
