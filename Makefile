@@ -6,7 +6,7 @@ install: package-lock.json
 latest:
 	git pull -r
 	git push
-	$(MAKE) sha.js
+	$(MAKE) -p sha.dev.js sha.js
 
 dev: install
 	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npm start
