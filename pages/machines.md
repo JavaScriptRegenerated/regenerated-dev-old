@@ -59,17 +59,56 @@ loader.results.then((results) => {
 });
 ```
 
+----
+
 ## Click
 
 <machines-example machine="ClickedState">
     <button slot=mainElement type=button>Click Listener</button>
 </machines-example>
 
+```js
+function ClickedState(button) {
+  function* Initial() {
+    yield on('click', Clicked);
+    yield listenTo(button, 'click');
+  }
+  function* Clicked() {}
+
+  return Initial;
+}
+```
+
+----
+
 ## Focus
 
 <machines-example machine="FocusState">
     <textarea slot=mainElement></textarea>
 </machines-example>
+
+```js
+function FocusState(el) {
+  function* CheckingStillActive() {
+    yield cond(el.ownerDocument.activeElement === el, Active);
+    yield always(Inactive);
+  }
+  function* Active() {
+    yield listenTo(el.ownerDocument, 'focusin');
+    yield listenTo(el, 'blur');
+    yield on('focusin', CheckingStillActive);
+    yield on('blur', CheckingStillActive);
+  }
+  function* Inactive() {
+    yield listenTo(el, 'focus');
+    yield on('focus', Active);
+  }
+
+  return Inactive;
+}
+```
+
+----
 
 ## Details
 
@@ -79,3 +118,19 @@ loader.results.then((results) => {
         <div>Some more details</div>
     </details>
 </machines-example>
+
+```js
+function* DetailsListener(el) {
+  yield listenTo(el, ['toggle']);
+  yield on('toggle', compound(CheckingOpen));
+
+  function* Closed() {}
+  function* Open() {}
+  function* CheckingOpen() {
+    yield cond(el.open, Open);
+    yield always(Closed);
+  }
+
+  return CheckingOpen;
+}
+```
