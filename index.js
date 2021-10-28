@@ -173,6 +173,7 @@ function* SharedStyleElement() {
   nav { margin: 1rem; }
   header[role=banner] { margin: 2rem 1rem; }
   article { margin: 4rem 1rem; }
+  footer[role=contentinfo] { font-size: 0.875rem; }
 
   h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }
   input[type="text"] { padding-left: 0.25rem; }
@@ -258,7 +259,7 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
       fetchContentHTML(contentURL),
       `</main>`,
       fetchContentHTML(pressGitHubURL("pages/_footer.md")),
-      `<small>${sha}</small>`
+      `<p>${sha}</p>`
     ]);
 
     event.waitUntil(promise);
@@ -312,6 +313,8 @@ async function handleRequest(request, event) {
   } else if (result.type === 'article') {
     if (result.slug === 'parsing') {
       return render(pressGitHubURL("pages/parsing.md"), jsdelivrURL("pages/parsing.client.js"), 'JavaScript Regenerated: Parsing')
+    } else if (result.slug === 'routing') {
+      return render(pressGitHubURL("pages/routing.md"), undefined, 'JavaScript Regenerated: Routing')
     } else if (result.slug === 'pattern-matching') {
       return render(pressGitHubURL("pages/pattern-matching.md"), undefined, 'JavaScript Regenerated: Pattern Matching')
     } else if (result.slug === 'markup') {
@@ -335,6 +338,8 @@ async function handleRequest(request, event) {
         )
         /* return fetch('https://staging.collected.press/1/s3/object/us-west-2/collected-workspaces/text/markdown/32b4f11a5fe3fd274ce2f0338d5d9af4e30c7e226f4923f510d43410119c0855') */
       }
+    } else {
+      return notFoundResponse(url);
     }
   } else if (result.type === 'articleModule') {
     if (PRODUCTION_LIKE === '1') {
