@@ -173,7 +173,7 @@ function* SharedStyleElement() {
   nav { margin: 1rem; }
   header[role=banner] { margin: 2rem 1rem; }
   article { margin: 4rem 1rem; }
-  footer[role=contentinfo] { font-size: 0.875rem; }
+  footer[role=contentinfo] { padding-top: 4rem; font-size: 0.875rem; }
 
   h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }
   input[type="text"] { padding-left: 0.25rem; }
