@@ -9,6 +9,8 @@
     <slot name=mainElement></slot>
 </template>
 
+Library used: [yieldmachine](https://github.com/JavaScriptRegenerated/yieldmachine)
+
 ## Click
 
 <machines-example machine="ClickedState">

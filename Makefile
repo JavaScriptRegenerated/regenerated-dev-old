@@ -68,8 +68,8 @@ tmp/$(DIGEST_HEX): $(FILE)
 sha.dev.js: s3_put
 	@echo "export const devSHAs = { 'pages/machines.client.js': '$(strip $(call sha256_file,pages/machines.client.js))', 'pages/machines.md': '$(strip $(call sha256_file,pages/machines.md))' }" > sha.dev.js
 
-REGENERATED_DEV_SHA := $(firstword $(shell git ls-remote https://github.com/RoyalIcing/regenerated.dev --symref HEAD))
-YIELDMACHINE_SHA := $(firstword $(shell git ls-remote https://github.com/RoyalIcing/yieldmachine --symref HEAD))
+REGENERATED_DEV_SHA := $(firstword $(shell git ls-remote https://github.com/JavaScriptRegenerated/regenerated.dev --symref HEAD))
+YIELDMACHINE_SHA := $(firstword $(shell git ls-remote https://github.com/JavaScriptRegenerated/yieldmachine --symref HEAD))
 tmp/sha/$(REGENERATED_DEV_SHA) tmp/sha/$(YIELDMACHINE_SHA):
 	@mkdir -p tmp/sha
 	@touch $@

@@ -1,6 +1,6 @@
 # Pattern Matching
 
-Library used: [yieldpattern](https://github.com/RoyalIcing/yieldpattern)
+Library used: [yieldpattern](https://github.com/JavaScriptRegenerated/yieldpattern)
 
 ```js
 import { match, _ } from "yieldpattern";

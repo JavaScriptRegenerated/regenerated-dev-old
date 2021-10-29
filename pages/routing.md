@@ -1,6 +1,6 @@
 # Routing with Generator Functions
 
-Library used: [yieldparser](https://github.com/RoyalIcing/yieldparser)
+Library used: [yieldparser](https://github.com/JavaScriptRegenerated/yieldparser)
 
 ## Approach A: Components return values
 

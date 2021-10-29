@@ -1,6 +1,6 @@
 # Rendering HTML
 
-GitHub: [yieldmarkup](https://github.com/RoyalIcing/yieldmarkup)
+GitHub: [yieldmarkup](https://github.com/JavaScriptRegenerated/yieldmarkup)
 
 ```js
 import { html, renderToString } from "yieldmarkup";

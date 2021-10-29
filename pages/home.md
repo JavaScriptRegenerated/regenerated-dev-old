@@ -4,11 +4,8 @@
 
 _Using components in more places with generator functions._
 
-## Projects
-### [YieldMachine](/yieldmachine)
 
-
-## Articles
+## Using generator functions to do:
 
 ### [State Machines](/article/machines)
 
@@ -22,7 +19,7 @@ _Using components in more places with generator functions._
 
 ### [Control The Flow](/article/control-the-flow)
 
-### Processing Collections
+### Process Collections
 
 GitHub: [itsybitsy](https://github.com/RoyalIcing/itsybitsy)
 
@@ -35,3 +32,6 @@ _Coming soon_
 ### Generator Functions vs Classes
 
 _Coming soon_
+
+## Projects
+### [YieldMachine](/yieldmachine)

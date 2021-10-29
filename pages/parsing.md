@@ -1,6 +1,6 @@
 # Parsing with Generator Functions
 
-Library used: [yieldparser](https://github.com/RoyalIcing/yieldparser)
+Library used: [yieldparser](https://github.com/JavaScriptRegenerated/yieldparser)
 
 ## IP Address
 

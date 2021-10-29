@@ -154,13 +154,6 @@ function* SharedStyleElement() {
 
   a { color: var(--link-color); text-decoration: none; }
   a:hover { text-decoration: underline; }
-  p, ul, ol, pre, hr, blockquote, h1, h2, h3, h4, h5, h6 { margin-bottom: 1rem; }
-  h1 { font-size: 2em; font-weight: 600; }
-  h2 { font-size: 1.5em; font-weight: 600; }
-  h3 { font-size: 1.25em; font-weight: 600; }
-  h4 { font-size: 1em; font-weight: 600; }
-  h5 { font-size: .875em; font-weight: 600; }
-  h6 { font-size: .85em; font-weight: 600; }
   img { display: inline-block; }
   article ul { list-style: inside; }
   nav ul { display: flex; flex-wrap: wrap; }
@@ -171,12 +164,11 @@ function* SharedStyleElement() {
   nav a:hover { background: #e9e9e9; border-color: #ddd; }*/
 
   nav { margin: 1rem; }
-  header[role=banner] { padding: 0.25rem 0.5rem; background: #000018; --link-color: white; text-transform: uppercase; font-weight: bold; }
+  header[role=banner] { padding: 0.25rem 0.5rem; background: #000018; border-bottom: 0.25px solid #ffffff3b; --link-color: white; font-weight: bold; }
   article { margin: 4rem 1rem; }
   footer[role=contentinfo] { padding-top: 4rem; font-size: 0.875rem; }
 
-  h1, h2, h3, p, ul, ol, dl, form { --px: var(--content-px); }
-  input[type="text"] { padding-left: 0.25rem; }
+  h1, h2, h3, h4, h5, h6, p, ul, ol, dl, pre, blockquote, form, hr { --px: var(--content-px); }
 
   h1 { font-size: 2rem; line-height: 1.2; font-weight: bold; margin-bottom: 1rem; }
   h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
@@ -193,6 +185,7 @@ function* SharedStyleElement() {
   em { font-style: italic; }
 
   input, textarea { color: black; }
+  input[type="text"] { padding-left: 0.25rem; }
   button { padding: 0.25em 0.5em; color: black; background: var(--link-color); border-radius: 999em; }
 
   .measure { max-width: var(--measure); }
@@ -257,7 +250,7 @@ function renderBanner() {
 <ul>
 <li><a href=/>JavaScript Regenerated</a>
 <li role=separator>
-<li><a href="https://twitter.com/royalicing/">by royalicing</a>
+<li><a href="https://twitter.com/royalicing/">by @royalicing</a>
 </nav>
 </header>
 `;

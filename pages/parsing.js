@@ -4,7 +4,7 @@ import { CodeBlock } from '../components';
 export function* Intro() {
   yield html`<article class="measure">`;
   yield html`<h2>Parsing</h2>`;
-  yield html`<p>GitHub: <a href="https://github.com/RoyalIcing/yieldparser">yieldparser</a>`;
+  yield html`<p>GitHub: <a href="https://github.com/JavaScriptRegenerated/yieldparser">yieldparser</a>`;
   yield CodeBlock("javascript", `
 import { parse, mustEnd } from "yieldparser";
 
@@ -59,7 +59,7 @@ parse('1.2.3.256', IPAddress());
 export function* Primary() {
   yield html`<article class="measure">`;
   yield html`<h1>Parsing with Generator Functions</h1>`;
-  yield html`<p>Library used: <a href="https://github.com/RoyalIcing/yieldparser">yieldparser</a>`;
+  yield html`<p>Library used: <a href="https://github.com/JavaScriptRegenerated/yieldparser">yieldparser</a>`;
 
   yield html`<h2>IP Address</h2>`;
 
