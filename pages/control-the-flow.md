@@ -44,6 +44,8 @@ function processor(genFun) {
         if (message === browserOnly && typeof window === 'undefined') {
             break; // Stop processing.
         }
+
+        // Process other messages…
     }
 }
 ```
