@@ -2,7 +2,7 @@
 
 <hero-icon name="solid/chat-alt-2.svg" width="40" height="40"></hero-icon>
 
-_Using components in more places with generator functions._
+_Use components in more places with generator functions._
 
 
 ## Using generator functions to do:
@@ -32,6 +32,8 @@ _Coming soon_
 ### Generator Functions vs Classes
 
 _Coming soon_
+
+----
 
 ## Projects
 ### [YieldMachine](/yieldmachine)
