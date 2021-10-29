@@ -270,7 +270,7 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
       fetchContentHTML(contentURL),
       `</main>`,
       fetchContentHTML(pressGitHubURL("pages/_footer.md")),
-      `<p>${sha}</p>`
+      `<p><small>${sha}</small></p>`
     ]);
 
     event.waitUntil(promise);
