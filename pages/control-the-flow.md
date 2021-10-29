@@ -41,7 +41,7 @@ const browserOnly = Symbol("browserOnly");
 
 function processor(genFun) {
     for (const message of genFun()) {
-        if (message === browserOnly && typeof window !== 'undefined') {
+        if (message === browserOnly && typeof window === 'undefined') {
             break; // Stop processing.
         }
     }
