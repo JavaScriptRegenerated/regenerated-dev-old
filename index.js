@@ -181,6 +181,8 @@ function* SharedStyleElement() {
   dt { font-weight: bold; }
   dd { text-align: "." center; }
   ul[class], ol[class] { list-style: none; }
+
+  hr { margin: 2rem auto; }
   
   em { font-style: italic; }
 
