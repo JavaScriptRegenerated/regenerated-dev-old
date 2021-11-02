@@ -177,6 +177,7 @@ function* SharedStyleElement() {
   p { margin: 1rem 0; }
   pre { font-size: 0.8rem; }
 
+  ul, ol, dl { margin-bottom: 1rem; }
   dl { display: grid; grid-template-columns: minmax(min-content, auto) max-content; }
   dt { font-weight: bold; }
   dd { text-align: "." center; }
