@@ -19,6 +19,8 @@ _Use components in more places with generator functions._
 
 ### [Control The Flow](/article/control-the-flow)
 
+### [Rich Keys with Symbols](/article/rich-keys)
+
 ### Process Collections
 
 GitHub: [itsybitsy](https://github.com/RoyalIcing/itsybitsy)

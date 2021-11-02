@@ -90,6 +90,10 @@ class MachinesExample extends HTMLElement {
     this.update();
   }
 
+  disconnectedCallback() {
+    this.machine.abort();
+  }
+
   handleEvent(event) {
     this.update();
   }

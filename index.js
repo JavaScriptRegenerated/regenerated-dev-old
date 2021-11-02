@@ -338,6 +338,8 @@ async function handleRequest(request, event) {
       return render(pressGitHubURL("pages/control-the-flow.md"), undefined, 'JavaScript Regenerated: Control The Flow')
     } else if (result.slug === 'message-generators') {
       return render(pressGitHubURL("pages/message-generators.md"), undefined, 'JavaScript Regenerated: Message Generators')
+    } else if (result.slug === 'rich-keys') {
+      return render(pressGitHubURL("pages/rich-keys.md"), undefined, 'JavaScript Regenerated: Rich Keys with Symbols')
     } else if (result.slug === 'tela') {
       return render(pressGitHubURL("pages/tela.md"), undefined, 'JavaScript Regenerated: TELA')
     } else if (result.slug === 'machines') {
