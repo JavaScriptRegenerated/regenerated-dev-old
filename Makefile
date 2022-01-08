@@ -75,7 +75,7 @@ YIELDMACHINE_SHA := $(firstword $(shell git ls-remote https://github.com/JavaScr
 tmp/sha/$(REGENERATED_DEV_SHA) tmp/sha/$(YIELDMACHINE_SHA):
 	@mkdir -p tmp/sha
 	@touch $@
-	@echo "Latest sha: $(notdir $@)"
+	@echo "Latest SHA: $(notdir $@)"
 
 sha.js: tmp/sha/$(REGENERATED_DEV_SHA) tmp/sha/$(YIELDMACHINE_SHA)
 	@echo "export const sha = '$(REGENERATED_DEV_SHA)'; export const yieldmachineSha = '$(YIELDMACHINE_SHA)';" > sha.js

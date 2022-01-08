@@ -114,7 +114,7 @@ class MachinesExample extends HTMLElement {
   }
 
   update() {
-    this.outputEl.textContent = this.machine.current;
+    this.outputEl.textContent = `${this.machine.value.state} ${this.machine.value.change}`;
   }
 }
 customElements.define('machines-example', MachinesExample);
