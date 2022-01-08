@@ -72,6 +72,7 @@ const machineRegistry = new Map();
 machineRegistry.set('ClickedState', ClickedState);
 machineRegistry.set('FocusState', FocusState);
 machineRegistry.set('DetailsListener', DetailsListener);
+machineRegistry.set('DocumentVisibilityListener', DocumentVisibilityListener);
 
 class MachinesExample extends HTMLElement {
   constructor() {
