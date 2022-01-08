@@ -12,3 +12,4 @@ node_modules/
 tmp/
 .DS_Store
 sha.js
+.vscode/*.log

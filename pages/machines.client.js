@@ -54,6 +54,20 @@ function* DetailsListener(el) {
   return CheckingOpen;
 }
 
+function* DocumentVisibilityListener() {
+  yield listenTo(document, ['visibilitychange']);
+  yield on('visibilitychange', compound(Checking));
+
+  function* Visible() {}
+  function* Hidden() {}
+  function* Checking() {
+    yield cond(document.visibilityState === 'visible', Visible);
+    yield always(Hidden);
+  }
+
+  return Checking;
+}
+
 const machineRegistry = new Map();
 machineRegistry.set('ClickedState', ClickedState);
 machineRegistry.set('FocusState', FocusState);

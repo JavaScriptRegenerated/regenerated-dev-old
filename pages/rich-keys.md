@@ -106,7 +106,7 @@ cache[getUser]
 // { name: 'Jane Jones' }
 ```
 
-The URL’s href is its canonical string form.
+The canonical string of a URL is its href.
 
 ----
 

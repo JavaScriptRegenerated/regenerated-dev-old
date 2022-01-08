@@ -87,6 +87,30 @@ function* DetailsListener(el) {
 
 ----
 
+## Document Visibility
+
+<machines-example machine="DocumentVisibilityListener">
+    <div slot=mainElement></div>
+</machines-example>
+
+```js
+function* DocumentVisibilityListener() {
+  yield listenTo(document, ['visibilitychange']);
+  yield on('visibilitychange', compound(Checking));
+
+  function* Visible() {}
+  function* Hidden() {}
+  function* Checking() {
+    yield cond(document.visibilityState === 'visible', Visible);
+    yield always(Hidden);
+  }
+
+  return Checking;
+}
+```
+
+----
+
 ## Fetch
 
 ```js
