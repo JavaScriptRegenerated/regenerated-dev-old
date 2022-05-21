@@ -9,22 +9,22 @@ latest:
 	$(MAKE) sha.dev.js sha.js
 
 dev: install
-	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npm start
+	@CLOUDFLARE_ACCOUNT_ID=$(CLOUDFLARE_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npm start
 	
 production: sha.js
-	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish
+	@CLOUDFLARE_ACCOUNT_ID=$(CLOUDFLARE_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npx wrangler publish
 
 staging: clean sha.js
-	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish --env staging
+	@CLOUDFLARE_ACCOUNT_ID=$(CLOUDFLARE_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npx wrangler publish --env staging
 
 preview: clean sha.js
-	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler preview --watch
+	@CLOUDFLARE_ACCOUNT_ID=$(CLOUDFLARE_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npx wrangler preview --watch
 
 logs_production:
-	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail
+	@CLOUDFLARE_ACCOUNT_ID=$(CLOUDFLARE_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npx wrangler tail
 
 logs_staging:
-	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler tail --env staging
+	@CLOUDFLARE_ACCOUNT_ID=$(CLOUDFLARE_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npx wrangler tail --env staging
 
 clean:
 	@rm -rf dist/ worker/

@@ -5,18 +5,20 @@ kv_namespaces = []
 workers_dev = true
 
 [vars]
-PRODUCTION_LIKE = 0
+    PRODUCTION_LIKE = 0
 
 [env.production]
-# name = "regenerated-dev"
-routes = ["regenerated.dev/*", "www.regenerated.dev/*"]
-workers_dev = false
+    # name = "regenerated-dev"
+    routes = ["regenerated.dev/*", "www.regenerated.dev/*"]
+    workers_dev = false
+    kv_namespaces = []
 [env.production.vars]
-PRODUCTION_LIKE = 1
+    PRODUCTION_LIKE = 1
 
 [env.staging]
-name = "regenerated-dev-staging"
-route = "staging.regenerated.dev/*"
-workers_dev = false
+    name = "regenerated-dev-staging"
+    route = "staging.regenerated.dev/*"
+    workers_dev = false
+    kv_namespaces = []
 [env.staging.vars]
-PRODUCTION_LIKE = 1
+    PRODUCTION_LIKE = 1
