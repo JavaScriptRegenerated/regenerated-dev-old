@@ -1,7 +1,6 @@
 name = "regenerated-dev"
+main = "index.js"
 compatibility_date = "2021-09-26"
-type = "webpack"
-zone_id = ""
 kv_namespaces = []
 workers_dev = true
 

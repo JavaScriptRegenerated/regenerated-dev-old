@@ -1,1 +1,1 @@
-export const devSHAs = { 'pages/machines.client.js': 'fd6e5535c0006de4f0d02f9828acc2606f1b911cad3daf0bc3e42f12b4cc2f02', 'pages/machines.md': '06cb35a52fd2f62f177b1ad956d5b931dc46f45d54bdca7a6122daaa22865c7b' }
+export const devSHAs = { 'pages/machines.client.js': 'a9a2aeea6a689f636148919e1dc9c0406d45f4645d43aff8141c076350170294', 'pages/machines.md': '06cb35a52fd2f62f177b1ad956d5b931dc46f45d54bdca7a6122daaa22865c7b' }

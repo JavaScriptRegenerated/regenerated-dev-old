@@ -10,9 +10,6 @@ latest:
 
 dev: install
 	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) npm start
-
-miniflare: install
-	npx miniflare@latest --live-reload
 	
 production: sha.js
 	@CF_ACCOUNT_ID=$(CF_ACCOUNT_ID) CF_ZONE_ID=$(CF_ZONE_ID) wrangler publish
@@ -49,7 +46,7 @@ define sha256_file
 endef
 
 AWS_ENV := AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
-FILES := pages/machines.client.js pages/machines.md
+FILES := pages/machines.client.js pages/machines.md pages/parsing.md
 FILE := pages/machines.client.js
 DIGEST_HEX := $(call sha256_file,$(FILE))
 MIME_TYPE := application/javascript
@@ -79,3 +76,7 @@ tmp/sha/$(REGENERATED_DEV_SHA) tmp/sha/$(YIELDMACHINE_SHA):
 
 sha.js: tmp/sha/$(REGENERATED_DEV_SHA) tmp/sha/$(YIELDMACHINE_SHA)
 	@echo "export const sha = '$(REGENERATED_DEV_SHA)'; export const yieldmachineSha = '$(YIELDMACHINE_SHA)';" > sha.js
+
+tmp/pages-txt/parsing.txt:
+	@mkdir -p tmp/pages-txt
+	@cp pages/parsing.md tmp/pages-txt/parsing.txt

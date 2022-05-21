@@ -3,6 +3,7 @@ import { parse, mustEnd } from 'yieldparser';
 import { toCode } from 'scalemodel';
 import { IconElementHandler } from './view/icons';
 import { sha, yieldmachineSha } from './sha';
+import * as PageContent from "./pages";
 
 let devSHAs = {};
 if (PRODUCTION_LIKE !== '1') {
@@ -10,6 +11,7 @@ if (PRODUCTION_LIKE !== '1') {
 }
 
 const config = Object.freeze({
+  // TODO: for development, we could start a local server `npx collected-press --port 8989 ./`
   pressGitHubURL: new URL(`https://collected.press/1/github/RoyalIcing/regenerated.dev@${sha}/`),
   pressS3URL: new URL(`https://staging.collected.press/1/s3/object/us-west-2/collected-workspaces/`),
   jsdelivrURL: new URL(`https://cdn.jsdelivr.net/gh/RoyalIcing/regenerated.dev@${sha}/`),
@@ -47,7 +49,7 @@ const ExternalScripts = {
   },
 }
 
-function *PrismScript() {
+function* PrismScript() {
   return;
   yield html`<!-- Prism syntax highlighting -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js" integrity="sha512-hqRrGU7ys5tkcqxx5FIZTBb7PkO2o3mU6U5+qB9b55kgMlBUT4J2wPwQfMCxeJW1fC8pBxuatxoH//z0FInhrA==" crossorigin="anonymous"></script>
@@ -124,7 +126,7 @@ function* PathParser() {
     yield mustEnd;
     return { type: 'press', url: new URL("readme.md", config.pressYieldmachineURL), title: 'Yield Machine' };
   }
-  
+
   return yield [Home, ArticleModule, ArticlePage, YieldmachinePage];
 }
 
@@ -298,6 +300,124 @@ async function renderPage(event, requestURL, contentURL, clientURL, title) {
   );
 }
 
+// From: https://developers.cloudflare.com/workers/learning/using-websockets/#writing-a-websocket-client
+async function websocket(url) {
+  // Make a fetch request including `Upgrade: websocket` header.
+  // The Workers Runtime will automatically handle other requirements
+  // of the WebSocket protocol, like the Sec-WebSocket-Key header.
+  const response = await fetch(url, {
+    headers: {
+      Upgrade: 'websocket',
+    },
+  });
+
+  // If the WebSocket handshake completed successfully, then the
+  // response has a `webSocket` property.
+  let ws = response.webSocket;
+  if (!ws) {
+    throw new Error("server didn't accept WebSocket");
+  }
+
+  // Call accept() to indicate that you'll be handling the socket here
+  // in JavaScript, as opposed to returning it on to a client.
+  await ws.accept();
+
+  // Now you can send and receive messages like before.
+  return ws;
+}
+
+class CollectedPressRenderer {
+  constructor() {
+    this.requestedIDs = new Set();
+    this.replies = new Map();
+  }
+
+  async start() {
+    if (this.ws) {
+      console.log("READY STATE", this.ws.readyState)
+      if (this.ws.readyState <= 1) {
+        return this.ws
+      }
+    }
+
+    const ws = await websocket('https://collected.press/1/ws')
+    // const ws = await websocket('http://localhost:4321/1/ws')
+    ws.addEventListener('message', event => {
+      console.log("RECEIVED", event)
+      try {
+        const data = (typeof event.data === "string") ? event.data : (new TextDecoder()).decode(event.data)
+        const reply = JSON.parse(data);
+        const id = reply.id;
+        if (typeof id === 'string' && this.requestedIDs.has(id)) {
+          this.replies.set(id, reply);
+        }
+      }
+      finally { }
+      // console.log(event.data);
+    });
+    this.ws = ws;
+    return ws;
+  }
+
+  async send(id, method, params) {
+    const ws = await this.start();
+
+    const message = {
+      jsonrpc: "2.0",
+      id,
+      method,
+      params
+    };
+    this.requestedIDs.add(id);
+    ws.send(JSON.stringify(message));
+  }
+
+  async renderMarkdown(source) {
+    const id = crypto.randomUUID()
+    await this.send(id, "renderMarkdown", {
+      type: "text/markdown",
+      source
+    });
+
+    const aborter = new AbortController();
+    setTimeout(() => {
+      aborter.abort()
+    }, 5000);
+
+    return new Promise((resolve, reject) => {
+      let succeeded = false;
+      // aborter.signal.addEventListener('close', () => {
+      //   console.log("CLOSE!")
+      //   aborter.abort()
+      // }, { signal: aborter.signal });
+      // aborter.signal.addEventListener('error', () => {
+      //   console.log("CLOSE ERROR!")
+      //   aborter.abort()
+      // }, { signal: aborter.signal });
+      aborter.signal.addEventListener('abort', () => {
+        // We get an error unless we close, so we always restart the WebSocket!
+        // It’s a bit unfortunate as the whole point is that the connection is left open.
+        this.ws?.close()
+        
+        if (!succeeded) {
+          reject(Error("Timed out"));
+        }
+      })
+
+      this.ws.addEventListener('message', () => {
+        if (this.replies.has(id)) {
+          resolve(this.replies.get(id));
+          succeeded = true;
+          console.log('ID', id, aborter.signal.aborted)
+          aborter.abort();
+        }
+      }, { signal: aborter.signal });
+    });
+  }
+}
+
+let collectedPressRenderer = null;
+
 /**
  * Respond with results
  * @param {Request} request
@@ -308,13 +428,29 @@ async function handleRequest(request, event) {
   const { pathname } = url;
   const { success, result } = parsePath(pathname);
 
+  if (!success) {
+    return notFoundResponse(url);
+  }
+
+  function pressURL(path) {
+    if (PRODUCTION_LIKE === '1') {
+      pressGitHubURL(path)
+    } else {
+      pressS3URL(`text/markdown/${devSHAs[path]}`)
+    }
+  }
+
   console.log('Go!')
   const render = renderPage.bind(null, event, url)
   console.log(result, devSHAs)
 
-  if (!success) {
-    return notFoundResponse(url);
-  } else if (result.type === 'home') {
+  if (collectedPressRenderer === null) {
+    collectedPressRenderer = new CollectedPressRenderer()
+    await collectedPressRenderer.start()
+  }
+
+
+  if (result.type === 'home') {
     if (url.searchParams.has('icons')) {
       const res = await render(pressGitHubURL("pages/home.md"), undefined, 'JavaScript Regenerated');
       const rewriter = new HTMLRewriter();
@@ -327,7 +463,24 @@ async function handleRequest(request, event) {
     /* return new Response('<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><p>Hello!</p>', { headers: { 'content-type': contentTypes.html } }); */
   } else if (result.type === 'article') {
     if (result.slug === 'parsing') {
-      return render(pressGitHubURL("pages/parsing.md"), jsdelivrURL("pages/parsing.client.js"), 'JavaScript Regenerated: Parsing')
+      if (PRODUCTION_LIKE === '1') {
+        return render(pressGitHubURL("pages/parsing.md"), jsdelivrURL("pages/parsing.client.js"), 'JavaScript Regenerated: Parsing')
+      } else {
+        const pageContent = PageContent.Parsing;
+        // const resultHTML = await collectedPressRenderer.renderMarkdown(pageContent).then(result => result?.result?.html)
+        const [stream, promise] = streamStyledHTML(() => [
+          // renderHTML([html`<title>`, title, html`</title>`]),
+          `<body>`,
+          renderBanner(),
+          `<main>`,
+          collectedPressRenderer.renderMarkdown(pageContent).then(result => result?.result?.html).catch(error => "Error loading from collected.press: " + error.message),
+          `</main>`,
+          // fetchContentHTML(pressGitHubURL("pages/_footer.md")),
+        ])
+        event.waitUntil(promise);
+        return new Response(stream, { headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } });
+        // return new Response(resultHTML ?? "Error!", { headers: { ...secureHTMLHeaders, 'content-type': contentTypes.html } });
+      }
     } else if (result.slug === 'routing') {
       return render(pressGitHubURL("pages/routing.md"), undefined, 'JavaScript Regenerated: Routing')
     } else if (result.slug === 'pattern-matching') {
@@ -372,5 +525,5 @@ async function handleRequest(request, event) {
   } else {
     return notFoundResponse(url);
   }
-    /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
+  /* return new Response(result.slug, { headers: { 'content-type': contentTypes.html } }); */
 }

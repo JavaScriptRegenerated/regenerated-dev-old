@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "worker",
+  "name": "regenerated.dev",
   "version": "1.0.0",
   "description": "A template for kick starting a Cloudflare Workers project",
   "main": "index.js",
@@ -12,14 +12,12 @@
   "author": "Patrick Smith <pgwsmith@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@cloudflare/wrangler": "^1.19.3",
-    "@playwright/test": "^1.15.0",
+    "@playwright/test": "^1.22.2",
     "aws4fetch": "^1.0.13",
-    "miniflare": "^1.4.1",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "wrangler": "^2.0.6"
   },
   "dependencies": {
-    "parcook": "^0.2.0",
     "scalemodel": "^0.1.0",
     "yieldcss": "^0.1.0",
     "yieldmarkup": "^0.2.0",
