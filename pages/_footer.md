@@ -1,4 +1,4 @@
-© 2021 Patrick Smith
+© 2022 Patrick Smith
 · <a href="https://icing.space/">Blog</a>
 · <a href="https://twitter.com/royalicing/">Twitter</a>
 · <a href="https://github.com/JavaScriptRegenerated/">GitHub</a>
